@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.betalife.sushibuffet.dao.CategoryMapper">
+	<cache flushInterval="600000"/>
+
+	<select id="selectByParentId" parameterType="Category" resultType="Category" useCache="false">
+		SELECT
+			c.id, c.active, c.position, c.thumb, m.name, m.desc as description
+		FROM
+			category c LEFT JOIN multilang m ON m.id = CONCAT('c',c.id)  AND m.locale=#{locale}
+		WHERE 
+			c.parent_id = #{parentId} and c.active=true
+		Order by c.position	
+	</select>
+
+	<select id="selectAll" parameterType="String"  resultType="Category">
+		SELECT
+			c.id, c.active, c.position, c.thumb, m.name, m.desc as description, c.bar_name
+		FROM
+			category c LEFT JOIN multilang m ON m.id = CONCAT('c',c.id)  AND m.locale=#{locale}
+		WHERE 
+			c.active=true
+		Order by c.position	
+	</select>
+
+</mapper>

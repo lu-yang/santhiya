@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.betalife.sushibuffet.dao.AttributionGroupMapper">
+	
+	<resultMap id="attributionGroupResult" type="AttributionGroup">
+		<id property="id" column="id" />
+		<result property="productId" column="product_id" />
+		<association property="attribution" javaType="Attribution">
+			<id property="id" column="attribution_id" />
+			<result property="attributionPrice" column="attribution_price" />
+			<result property="attributionName" column="name" />
+		</association>
+	</resultMap>
+	
+	<select id="selectByProductId" parameterType="Product" resultMap="attributionGroupResult">
+		SELECT
+			ag.id, ag.product_id, ag.attribution_id,  a.attribution_price, m.NAME
+		FROM
+			attributiongroup ag, attribution a LEFT JOIN multilang m ON m.id = CONCAT('a', a.id) AND m.locale = #{locale}
+		WHERE 
+			ag.product_id = #{id} AND
+			ag.attribution_id = a.id
+	</select>
+	
+	<select id="selectByProductIds" resultMap="attributionGroupResult">
+		SELECT
+			ag.id, ag.product_id, ag.attribution_id,  a.attribution_price, m.NAME
+		FROM
+			attributiongroup ag, attribution a LEFT JOIN multilang m ON m.id = CONCAT('a', a.id) AND m.locale = #{locale}
+		WHERE 
+			ag.attribution_id = a.id AND 
+			ag.product_id in
+			<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+		    <!-- http://my.oschina.net/linuxred/blog/38802 foreach 说明 -->
+			#{item}
+			</foreach>
+	</select>
+	
+</mapper>

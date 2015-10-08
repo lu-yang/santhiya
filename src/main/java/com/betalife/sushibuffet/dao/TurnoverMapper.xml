@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.betalife.sushibuffet.dao.TurnoverMapper">
+
+	<insert id="insert" parameterType="Turnover" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO turnover
+		(table_id, checkout, first_table_id, discount, takeaway_id)
+		VALUES
+		(#{tableId}, #{checkout}, #{firstTableId}, #{discount}, #{takeawayId})
+	</insert>
+
+	<update id="update" parameterType="Turnover">
+		UPDATE turnover
+		SET
+		table_id=#{tableId}, discount=#{discount}, checkout=#{checkout}, payment=#{payment},
+		updated=now()
+		WHERE id=#{id}
+	</update>
+
+	<select id="select" parameterType="Turnover" resultType="Turnover">
+		SELECT
+		id, table_id, discount, checkout, takeaway_id, payment
+		FROM turnover
+		WHERE id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="Turnover">
+		DELETE FROM turnover
+		WHERE id=#{id}
+	</delete>
+	
+	<delete id="deleteAll" >
+		DELETE FROM turnover
+	</delete>
+
+</mapper>

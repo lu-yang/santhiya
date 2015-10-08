@@ -1,0 +1,24 @@
+<html>
+<style>
+body{font-family:Arial;font-size:13px;width:220px;}
+.rep{width:220px;word-wrap:break-word;padding:0 10px 0 0;}
+</style>
+<div class="rep">
+				<b>${barname}&nbsp;&nbsp;${date}</b><br><br>
+
+
+			
+			<#list list as one>
+				${one['count']} 份&nbsp;&nbsp;${one['cname']}&nbsp;&nbsp;${one['pname']}<br>
+				
+			</#list><br>
+			<hr><br><br>
+				
+			<#if tableNo??>
+			台号:${tableNo}
+			<#else>
+			外卖号:${takeawayNo}
+			</#if> 
+
+</div>
+</html>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.betalife.sushibuffet.dao.ProductMapper">
+	<cache flushInterval="600000"/>
+
+	<select id="selectByCategoryId" parameterType="Product" resultType="Product" useCache="false">
+		SELECT
+			p.id, p.category_id, p.product_price, p.active, p.position,  p.thumb, p.num, p.product_num,
+			m.name as productName, m.desc as description
+		FROM
+			product p LEFT JOIN multilang m 
+				ON m.id = CONCAT('p', p.id) AND m.locale= #{locale}
+		WHERE 
+			p.category_id = #{categoryId} 
+			AND p.active=true
+		Order by p.position 
+	</select>
+
+	<select id="selectById" parameterType="Product" resultType="Product" useCache="false">
+		SELECT
+			p.id, p.category_id, p.product_price, p.active, p.position,  p.thumb, p.num, p.product_num,
+			m.name as productName, m.desc as description
+		FROM
+			product p LEFT JOIN multilang m 
+				ON m.id = CONCAT('p',p.id) AND m.locale= #{locale}
+		WHERE 
+			p.id = #{id}
+			AND  p.active=true
+		Order by p.position 
+	</select>
+
+	<select id="selectAll"  parameterType="String" resultType="Product">
+		SELECT
+			p.id, p.category_id, p.product_price, p.active, p.position, p.thumb, p.num, p.product_num,
+			m.name as productName, m.desc as description
+		FROM
+			product p LEFT JOIN multilang m 
+				ON m.id = CONCAT('p', p.id) AND m.locale= #{locale}
+		WHERE 
+			p.active=true
+		Order by p.position 
+	</select>
+
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.betalife.sushibuffet.dao.OrderAttributionMapper">
+	
+	<resultMap id="orderAttributionResult" type="OrderAttribution">
+		<id property="id" column="id" />
+		<result property="orderId" column="order_id" />
+		<association property="attribution" javaType="Attribution">
+			<id property="id" column="attribution_id" />
+			<result property="attributionPrice" column="attribution_price" />
+			<result property="attributionName" column="name" />
+		</association>
+	</resultMap>
+	
+	<select id="selectByOrderId" parameterType="Order" resultMap="orderAttributionResult">
+		SELECT
+			oa.id, oa.order_id, oa.attribution_id,  a.attribution_price, m.NAME
+		FROM
+			orderattribution oa, attribution a LEFT JOIN multilang m ON m.id = CONCAT('a', a.id) AND m.locale = #{locale}
+		WHERE 
+			oa.order_id = #{id} AND
+			oa.attribution_id = a.id
+	</select>
+	
+	<select id="selectByOrderIds" resultMap="orderAttributionResult">
+		SELECT
+			oa.id, oa.order_id, oa.attribution_id,  a.attribution_price, m.NAME
+		FROM
+			orderattribution oa, attribution a LEFT JOIN multilang m ON m.id = CONCAT('a', a.id) AND m.locale = #{locale}
+		WHERE 
+			oa.attribution_id = a.id AND 
+			oa.order_id in
+			<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+		    <!-- http://my.oschina.net/linuxred/blog/38802 foreach 说明 -->
+			#{item}
+			</foreach>
+	</select>
+	
+	<insert id="insert" parameterType="OrderAttribution" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO `orderattribution`
+		(order_id, attribution_id, `count`, created)
+		VALUES
+		(#{orderId}, #{attribution.id}, #{count}, #{created})
+	</insert>
+	
+	<delete id="delete" parameterType="Order">
+		DELETE FROM `orderattribution`
+		WHERE order_id in 
+		(
+			select id from `order` where turnover_id=#{turnover.id}
+		)
+	</delete>
+
+	<delete id="deleteAll">
+		DELETE FROM `orderattribution`
+	</delete>
+	
+</mapper>

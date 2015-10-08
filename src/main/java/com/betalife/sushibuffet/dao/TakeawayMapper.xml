@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.betalife.sushibuffet.dao.TakeawayMapper">
+
+	<resultMap id="takeawayResult" type="Takeaway">
+		<id property="id" column="id" />
+		<result property="memo" column="memo" />
+		<result property="takeaway" column="takeaway" />
+		<result property="created" column="created" />
+		<association property="turnover" javaType="Turnover">
+			<id property="id" column="turnover_id" />
+			<result property="checkout" column="checkout" />
+			<result property="takeawayId" column="id" />
+			<result property="discount" column="discount" />
+			<result property="payment" column="payment" />
+		</association>
+	</resultMap>
+
+	<resultMap id="takeawayExtResult" type="TakeawayExt" extends="takeawayResult">
+		<result property="total" column="total" />
+	</resultMap>
+
+	<insert id="insert" parameterType="Takeaway" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO takeaway (memo, takeaway)
+		VALUES (#{memo},
+		#{takeaway})
+	</insert>
+
+	<update id="update" parameterType="Takeaway">
+		UPDATE takeaway
+		SET
+		memo=#{memo},
+		takeaway=#{takeaway},
+		updated=now()
+		WHERE id=#{id}
+	</update>
+
+	<select id="selectTodayTakeaways" resultMap="takeawayExtResult">
+		SELECT 
+		  SUM(o.COUNT* p.product_price) AS total,
+		  tn.id AS turnover_id, tn.discount, tn.checkout, tn.payment, ta.memo, ta.takeaway, ta.created, ta.id 
+		FROM
+		  `order` o, product p,  turnover tn, takeaway ta  
+		WHERE ta.created BETWEEN CURDATE() 
+		  AND DATE_ADD(CURDATE(), INTERVAL 1 DAY) 
+		  AND tn.takeaway_id = ta.id 
+		  AND o.turnover_id = tn.id 
+		  AND o.product_id = p.id 
+		GROUP BY ta.id 
+		ORDER BY ta.created DESC ;	    
+	</select>
+
+	<select id="select" parameterType="Takeaway" resultMap="takeawayResult">
+		SELECT
+		tor.id as turnover_id, tor.checkout, tor.takeaway_id, tor.discount, tor.payment
+		ta.created,ta.memo,ta.takeaway,ta.id
+		FROM
+		takeaway ta, turnover tor
+		WHERE ta.id=tor.takeaway_id
+		AND ta.id=#{id};
+	</select>
+
+	<delete id="delete" parameterType="Takeaway">
+		DELETE FROM takeaway
+		WHERE
+		id=#{id}
+	</delete>
+
+	<delete id="deleteAll">
+		DELETE FROM takeaway
+	</delete>
+
+</mapper>

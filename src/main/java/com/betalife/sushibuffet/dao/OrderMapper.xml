@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.betalife.sushibuffet.dao.OrderMapper">
+
+	<resultMap id="orderResult" type="Order">
+		<id property="id" column="id" />
+		<result property="count" column="count" />
+		<result property="created" column="created" />
+		<result property="updated" column="updated" />
+		<association property="turnover" javaType="Turnover">
+			<id property="id" column="turnover_id" />
+			<result property="checkout" column="checkout" />
+			<result property="tableId" column="table_id" />
+			<result property="takeawayId" column="takeaway_id" />
+			<result property="discount" column="discount" />
+			<result property="payment" column="payment" />
+		</association>
+		<association property="product" javaType="Product">
+			<id property="id" column="product_id" />
+			<result property="categoryId" column="category_id" />
+			<result property="productPrice" column="product_price" />
+			<result property="thumb" column="thumb" />
+			<result property="productName" column="name" />
+			<result property="num" column="num" />
+			<result property="productNum" column="product_num" />
+			<result property="taxgroupId" column="taxgroup_id" />
+		</association>
+	</resultMap>
+
+	<resultMap id="orderExtResult" type="OrderExt" extends="orderResult">
+		<association property="category" javaType="Category">
+			<id property="id" column="category_id" />
+			<result property="name" column="category_name" />			
+		</association>
+	</resultMap>
+
+	<select id="selectExtOrdersByTurnover" parameterType="Order" resultMap="orderExtResult">
+		SELECT o.id,o.`count`,o.turnover_id,o.product_id,t.checkout,o.updated,o.created,p.product_num, t.discount, t.payment, 
+			p.taxgroup_id,t.table_id,p.category_id,p.num,p.product_price,p.thumb,m.NAME product_name,m2.NAME category_name 
+		FROM `order` o, turnover t, 
+			product p LEFT JOIN multilang m ON m.id = CONCAT('p', p.id) AND m.locale = #{locale},
+			category c LEFT JOIN multilang m2 ON m2.id = CONCAT('c', c.id) AND m2.locale = #{locale} 
+		WHERE o.turnover_id = #{turnover.id} 
+		  AND o.turnover_id = t.id 
+		  AND o.product_id = p.id 
+		  AND c.id = p.category_id
+		  AND p.active = TRUE 
+		ORDER BY o.created 
+	</select>
+
+	<select id="selectOrdersByTurnover" parameterType="Order" resultMap="orderResult">
+		SELECT o.id, o.`count`, o.turnover_id, o.product_id, t.checkout, o.updated, o.created, p.product_num, p.taxgroup_id,
+		t.table_id, p.category_id, p.num, p.product_price, p.thumb, m.NAME, t.discount, t.payment
+		FROM `order` o,	turnover t, product p LEFT JOIN multilang m ON m.id = CONCAT('p', p.id) 	AND m.locale = #{locale}
+		WHERE o.turnover_id = #{turnover.id}
+		AND o.turnover_id = t.id
+		AND o.product_id = p.id
+		AND p.active=true
+		Order by o.created
+	</select>
+
+	<select id="selectOrdersByDate" parameterType="map" resultMap="orderResult">
+		SELECT o.id, o.`count`, o.turnover_id, o.product_id, o.updated, o.created, p.taxgroup_id,
+		p.category_id, p.product_price, t.discount, 	t.checkout, 	t.takeaway_id, t.table_id, t.payment
+		FROM `order` o, turnover t, 	product p
+		WHERE o.turnover_id = t.id
+		AND o.product_id = p.id
+		AND o.created BETWEEN #{from} AND #{to}
+	</select>
+
+	<select id="selectOrders" resultMap="orderResult">
+		SELECT o.id, o.`count`, o.turnover_id, o.product_id, o.updated, o.created, t.table_id, t.payment, 
+			p.category_id, p.num, p.product_price, p.thumb, m.NAME
+		FROM `order` o, turnover t, product p LEFT JOIN multilang m ON m.id = CONCAT('p', p.id) AND m.locale = #{locale}
+		WHERE o.id in
+		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+		    <!-- http://my.oschina.net/linuxred/blog/38802 foreach 说明 -->
+			#{item}
+		</foreach>
+		AND o.turnover_id = t.id
+		AND o.product_id = p.id
+		AND p.active=true
+		Order by o.created
+	</select>
+
+	<insert id="insert" parameterType="Order" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO `order`
+		(turnover_id, product_id, `count`, created)
+		VALUES
+		(#{turnover.id}, #{product.id}, #{count}, #{created})
+	</insert>
+
+	<update id="update" parameterType="Order">
+		UPDATE `order`
+		SET `count`=#{count}, updated=NOW()
+		WHERE id=#{id}
+	</update>
+
+	<delete id="delete" parameterType="Order">
+		DELETE FROM `order`
+		WHERE turnover_id=#{turnover.id}
+	</delete>
+
+	<delete id="deleteAll">
+		DELETE FROM `order`
+	</delete>
+
+</mapper>

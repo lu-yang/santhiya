@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+							http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl" value="${db.url}" />
+		<property name="user" value="${user.name}" />
+		<property name="password" value="${user.password}" />
+
+		<property name="minPoolSize" value="5" />
+		<property name="maxPoolSize" value="${db.max.pool.size}" />
+		<property name="automaticTestTable" value="C3P0TestTable" />
+		<property name="initialPoolSize" value="3" />
+		<property name="maxIdleTime" value="60" />
+		<property name="acquireIncrement" value="3" />
+		<property name="maxStatements" value="0" />
+		<property name="idleConnectionTestPeriod" value="60" />
+		<property name="acquireRetryAttempts" value="5" />
+	</bean>
+
+	<!-- define the SqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="typeAliasesPackage" value="com.betalife.sushibuffet.model" />
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
+	</bean>
+
+	<!-- scan for mappers and let them be autowired -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.betalife.sushibuffet.dao" />
+	</bean>
+
+</beans>

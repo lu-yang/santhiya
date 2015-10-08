@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.betalife.sushibuffet.dao.SettingsMapper">
+	<cache flushInterval="6000000" />
+
+	<select id="select" resultType="map" useCache="true">
+		SELECT
+		category_url,
+		product_url
+		FROM settings
+		WHERE id=1;
+	</select>
+
+
+</mapper>

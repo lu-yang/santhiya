@@ -1,0 +1,26 @@
+<#-- header  with logo -->
+\u001b|1B
+\u001b|cABrusselsesteenweg 416, 3090 Overijse
+\u001b|cATEL: 02 / 657 77 79
+\u001b|cAwww.dodoro.be
+
+<#if tableNo??>
+\u001b|bC\u001b|rATable No.: ${tableNo}\n
+<#else>
+\u001b|bC\u001b|rATakeaway No.: ${takeawayNo}\n
+</#if> 
+\u001b|bC\u001b|rAOrder time: ${date}\n
+
+<#list list as one>
+\u001b|N${one['pnum']}. ${one['pname']} x ${one['count']}
+\u001b|N${one['cname']} \u001b|rA\u001b|uC${one['subtotal']} Eur\u001b|N\n
+</#list>
+\u001b|Nt.v.a / b.t.w / v.a.t\n
+\u001b|NTax: Net  \u001b|cAExcl \u001b|rATotal\n
+\u001b|N${food_tax}: ${food_tax_paid} Eur  \u001b|cA${food_paid} Eur  \u001b|rA${food_total_paid} Eur 
+\u001b|N${alcool_tax}: ${alcool_tax_paid} Eur  \u001b|cA${alcool_paid} Eur  \u001b|rA${alcool_total_paid} Eur
+
+\u001b|bC\u001b|cATotal : ${total} Eur\n\n
+\u001b|bC\u001b|cADiscount : ${discount}\n\n
+\u001b|bC\u001b|cADiscount Price : ${discountPrice} Eur\n\n
+<#-- footer -->
