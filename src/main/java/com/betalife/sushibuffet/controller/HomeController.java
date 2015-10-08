@@ -37,11 +37,6 @@ import com.betalife.sushibuffet.model.TakeawayExt;
 import com.betalife.sushibuffet.model.Turnover;
 import com.betalife.sushibuffet.util.Constant;
 
-/**
- * Handles requests for the application home page.
- * 
- * @author Roy Clarkson
- */
 @Controller
 @RequestMapping("/*")
 public class HomeController {
