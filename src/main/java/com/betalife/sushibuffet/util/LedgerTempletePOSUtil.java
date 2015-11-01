@@ -3,7 +3,6 @@ package com.betalife.sushibuffet.util;
 import static com.betalife.sushibuffet.util.DodoroUtil.HUNDRED;
 import static com.betalife.sushibuffet.util.DodoroUtil.TEN_THOUSAND;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,11 +14,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.betalife.sushibuffet.model.Order;
+import com.betalife.sushibuffet.model.OrderAttribution;
 import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Taxgroups;
 import com.betalife.sushibuffet.model.Turnover;
-
-import freemarker.template.TemplateException;
 
 @Component
 public class LedgerTempletePOSUtil extends TempletePOSUtil {
@@ -30,7 +28,7 @@ public class LedgerTempletePOSUtil extends TempletePOSUtil {
 		this.templateFile = templateFile;
 	}
 
-	public Map<String, Object> buildParam(List<Order> orders) {
+	public Map<String, Object> buildParam(Turnover nouse, List<Order> orders, String nouse2) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("date", sdf.format(new Date()));
 
@@ -42,12 +40,23 @@ public class LedgerTempletePOSUtil extends TempletePOSUtil {
 
 			Integer discount = turnover.getDiscount();
 			// 0 表示免单，空表示无折扣
-			discount = discount == null ? 100 : discount;
+			if (discount == null) {
+				discount = 100;
+			} else if (discount > 0) {
+				discount = 100 - discount;
+			}
 
 			Product product = order.getProduct();
 			int count = order.getCount();
 			int productPrice = product.getProductPrice();
-			int subTotal = productPrice * count * (100 - discount);
+			int attSum = 0;
+			List<OrderAttribution> orderAttributions = order.getOrderAttributions();
+			if (!CollectionUtils.isEmpty(orderAttributions)) {
+				for (OrderAttribution oa : orderAttributions) {
+					attSum += oa.getCount() * oa.getAttribution().getAttributionPrice();
+				}
+			}
+			int subTotal = (productPrice * count + attSum) * discount;
 
 			total += subTotal;
 			String taxgroupId = product.getTaxgroupId() + "_" + takeaway;
@@ -67,8 +76,8 @@ public class LedgerTempletePOSUtil extends TempletePOSUtil {
 
 		putTotal(foodTax.getValue(), FOOD, getKindTotal(kindTotalMap, foodTax.getId() + "_" + false), map);
 
-		putTotal(alcoholTax.getValue(), ALCOHOL,
-				getKindTotal(kindTotalMap, alcoholTax.getId() + "_" + false), map);
+		putTotal(alcoholTax.getValue(), ALCOHOL, getKindTotal(kindTotalMap, alcoholTax.getId() + "_" + false),
+				map);
 
 		putTotal(foodTax.getTakeaway(), TAKEAWAY_PREFIX + FOOD,
 				getKindTotal(kindTotalMap, foodTax.getId() + "_" + true), map);
@@ -82,16 +91,6 @@ public class LedgerTempletePOSUtil extends TempletePOSUtil {
 	private BigDecimal getKindTotal(Map<String, Integer> kindTotalMap, String key) {
 		Integer integer = kindTotalMap.get(key);
 		return DodoroUtil.divide(integer, HUNDRED);
-	}
-
-	public String format_receipt_lines(List<Order> orders) throws TemplateException, IOException {
-		if (CollectionUtils.isEmpty(orders)) {
-			return null;
-		}
-		Map<String, Object> map = buildParam(orders);
-		String html = format(map);
-
-		return html;
 	}
 
 }

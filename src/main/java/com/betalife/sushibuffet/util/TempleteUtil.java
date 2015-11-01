@@ -18,7 +18,9 @@ import org.springframework.util.ResourceUtils;
 import com.betalife.sushibuffet.dao.CategoryMapper;
 import com.betalife.sushibuffet.dao.ProductMapper;
 import com.betalife.sushibuffet.model.Category;
+import com.betalife.sushibuffet.model.Order;
 import com.betalife.sushibuffet.model.Product;
+import com.betalife.sushibuffet.model.Turnover;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -40,6 +42,9 @@ public abstract class TempleteUtil {
 	protected String templateFile;
 
 	protected abstract void setTemplateFile(String templateFile);
+
+	public abstract Map<String, ?> buildParam(Turnover turnover, List<Order> orders, String locale)
+			throws Exception;
 
 	protected File getFile() throws IOException {
 		File file;

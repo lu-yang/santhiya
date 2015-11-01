@@ -3,7 +3,6 @@ package com.betalife.sushibuffet.util;
 import static com.betalife.sushibuffet.util.DodoroUtil.TEN_THOUSAND;
 import static com.betalife.sushibuffet.util.DodoroUtil.ZERO;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,13 +14,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.betalife.sushibuffet.model.Attribution;
 import com.betalife.sushibuffet.model.Category;
 import com.betalife.sushibuffet.model.Order;
+import com.betalife.sushibuffet.model.OrderAttribution;
 import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Taxgroups;
 import com.betalife.sushibuffet.model.Turnover;
-
-import freemarker.template.TemplateException;
 
 @Component
 public class ReceiptTempletePOSUtil extends TempletePOSUtil {
@@ -31,20 +30,7 @@ public class ReceiptTempletePOSUtil extends TempletePOSUtil {
 		this.templateFile = templateFile;
 	}
 
-	public String format_receipt_lines(List<Order> orders, String locale, Turnover turnover)
-			throws TemplateException, IOException {
-		if (CollectionUtils.isEmpty(orders)) {
-			return null;
-		}
-
-		Map<String, Object> map = buildParam(orders, locale, turnover);
-
-		String html = format(map);
-
-		return html;
-	}
-
-	public Map<String, Object> buildParam(List<Order> orders, String locale, Turnover turnover) {
+	public Map<String, Object> buildParam(Turnover turnover, List<Order> orders, String locale) {
 
 		Map<Integer, Category> categoryMap = getCategoryMap(locale);
 		Map<Integer, Product> productMap = getProductMap(locale);
@@ -61,7 +47,7 @@ public class ReceiptTempletePOSUtil extends TempletePOSUtil {
 			map.put("tableNo", tableId);
 		}
 
-		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		int total = 0;
 		Map<String, Integer> kindTotalMap = new HashMap<String, Integer>();
 
@@ -70,7 +56,7 @@ public class ReceiptTempletePOSUtil extends TempletePOSUtil {
 			Category category = categoryMap.get(product.getCategoryId());
 			String cateName = category == null ? "" : category.getName();
 
-			Map<String, String> one = new HashMap<String, String>();
+			Map<String, Object> one = new HashMap<String, Object>();
 			one.put("pname", productMap.get(product.getId()).getProductName());
 			int count = order.getCount();
 			one.put("count", count + "");
@@ -78,7 +64,28 @@ public class ReceiptTempletePOSUtil extends TempletePOSUtil {
 			one.put("cname", cateName);
 			int productPrice = product.getProductPrice();
 			one.put("price", DodoroUtil.getDisplayPrice(productPrice));
-			int subTotal = productPrice * count;
+
+			int attSum = 0;
+			List<Map<String, String>> attrList = new ArrayList<Map<String, String>>();
+			one.put("attrList", attrList);
+
+			List<OrderAttribution> orderAttributions = order.getOrderAttributions();
+			if (!CollectionUtils.isEmpty(orderAttributions)) {
+				for (OrderAttribution oa : orderAttributions) {
+					Attribution attr = oa.getAttribution();
+					Map<String, String> attrMap = new HashMap<String, String>();
+					attrList.add(attrMap);
+					attrMap.put("attrName", attr.getAttributionName());
+					int aCount = oa.getCount();
+					attrMap.put("aCount", aCount + "");
+					int attrPrice = attr.getAttributionPrice();
+					one.put("attrPrice", DodoroUtil.getDisplayPrice(attrPrice));
+					attSum += aCount * attrPrice;
+				}
+			}
+			one.put("attrSumPrice", DodoroUtil.getDisplayPrice(attSum));
+
+			int subTotal = productPrice * count + attSum;
 			one.put("subtotal", DodoroUtil.getDisplayPrice(subTotal));
 
 			list.add(one);
@@ -109,7 +116,8 @@ public class ReceiptTempletePOSUtil extends TempletePOSUtil {
 		} else {
 			putTotal(foodTax.getValue(), FOOD, getKindTotal(kindTotalMap, foodTax.getId() + ""), map);
 
-			putTotal(alcoholTax.getValue(), ALCOHOL, getKindTotal(kindTotalMap, alcoholTax.getId() + ""), map);
+			putTotal(alcoholTax.getValue(), ALCOHOL, getKindTotal(kindTotalMap, alcoholTax.getId() + ""),
+					map);
 		}
 
 		Integer percent = turnover.getDiscount();

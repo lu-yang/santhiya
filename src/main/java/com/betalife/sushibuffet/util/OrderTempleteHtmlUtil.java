@@ -23,7 +23,6 @@ import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Turnover;
 
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 
 @Component
 public class OrderTempleteHtmlUtil extends TempleteUtil {
@@ -54,8 +53,8 @@ public class OrderTempleteHtmlUtil extends TempleteUtil {
 		template.setEncoding("UTF-8");
 	}
 
-	public List<byte[]> format_order_lines(List<Order> orders, String locale) throws TemplateException,
-			IOException {
+	public Map<String, byte[]> buildParam(Turnover turnover, List<Order> orders, String locale)
+			throws Exception {
 		if (CollectionUtils.isEmpty(orders)) {
 			return null;
 		}
@@ -66,13 +65,12 @@ public class OrderTempleteHtmlUtil extends TempleteUtil {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("date", sdf.format(new Date()));
 
-		Turnover turnover = orders.get(0).getTurnover();
 		boolean takeaway = DodoroUtil.isTakeaway(turnover);
 		if (takeaway) {
 			Integer takeawayId = turnover.getTakeawayId();
 			map.put("takeawayNo", takeawayId);
 		} else {
-			int tableId = orders.get(0).getTurnover().getTableId();
+			int tableId = turnover.getTableId();
 			map.put("tableNo", tableId);
 		}
 
@@ -103,7 +101,7 @@ public class OrderTempleteHtmlUtil extends TempleteUtil {
 			list.add(one);
 		}
 
-		ArrayList<byte[]> list = new ArrayList<byte[]>();
+		Map<String, byte[]> printerMap = new HashMap<String, byte[]>();
 		Set<String> keySet = barNameMap.keySet();
 		for (String barname : keySet) {
 			map.put("barname", barname);
@@ -112,10 +110,10 @@ public class OrderTempleteHtmlUtil extends TempleteUtil {
 			String html = format(map);
 			html2ImageBytes.loadHtml(html);
 			byte[] bytes = html2ImageBytes.getBytes();
-			list.add(bytes);
+			printerMap.put(barname, bytes);
 		}
 
-		return list;
+		return printerMap;
 	}
 
 	@Value("${order.template}")

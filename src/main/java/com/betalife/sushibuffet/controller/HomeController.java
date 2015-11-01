@@ -22,6 +22,7 @@ import com.betalife.sushibuffet.exchange.CategoryListExchange;
 import com.betalife.sushibuffet.exchange.ConstantExchange;
 import com.betalife.sushibuffet.exchange.DiningtableListExchange;
 import com.betalife.sushibuffet.exchange.DodoroException;
+import com.betalife.sushibuffet.exchange.MapExchange;
 import com.betalife.sushibuffet.exchange.OrderListExchange;
 import com.betalife.sushibuffet.exchange.ProductListExchange;
 import com.betalife.sushibuffet.exchange.TakeawayExchange;
@@ -106,9 +107,10 @@ public class HomeController {
 	}
 
 	// 点菜。order的count表示增加量，例如：增加2个时，count是2，减少2个时，count是-2
-	@RequestMapping(value = "orders", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
-	public @ResponseBody TurnoverExchange takeOrders(@RequestBody List<Order> orders) throws Exception {
-		Turnover turnover = customerManager.takeOrders(orders);
+	@RequestMapping(value = "orders/{turnoverId}/{isPrint}", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
+	public @ResponseBody TurnoverExchange takeOrders(@RequestBody List<Order> orders,
+			@PathVariable int turnoverId, @PathVariable boolean isPrint) throws Exception {
+		Turnover turnover = customerManager.takeOrders(turnoverId, orders, isPrint);
 		TurnoverExchange exchange = new TurnoverExchange();
 		exchange.setModel(turnover);
 		return exchange;
@@ -155,13 +157,6 @@ public class HomeController {
 		return model;
 	}
 
-	// 打印所有turnoverId等于{turnoverId}的点单记录（结帐单）
-	@RequestMapping(value = "printOrders/{locale}/{turnoverId}", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody BooleanExchange printOrders(@PathVariable String locale,
-			@PathVariable int turnoverId) throws Exception {
-		return printOrders(locale, turnoverId, false);
-	}
-
 	private BooleanExchange printOrders(String locale, int turnoverId, boolean kitchen) throws Exception {
 		Order model = buildOrder(locale, turnoverId);
 		customerManager.printOrders(model, kitchen);
@@ -176,6 +171,25 @@ public class HomeController {
 			@PathVariable int turnoverId) throws Exception {
 		return printOrders(locale, turnoverId, true);
 	}
+
+	// 打印所有turnoverId等于{turnoverId}的点单记录（结帐单）
+	@RequestMapping(value = "printOrders/{locale}/{turnoverId}", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody BooleanExchange printOrders(@PathVariable String locale,
+			@PathVariable int turnoverId) throws Exception {
+		return printOrders(locale, turnoverId, false);
+	}
+
+	// 打印所有turnoverId等于{turnoverId}的点单记录（结帐单）
+	// @RequestMapping(value =
+	// "orders/print/{locale}/{turnoverId}/{checkout}/{kitchen}", method =
+	// RequestMethod.GET, produces = "application/json")
+	// public @ResponseBody BooleanExchange printOrders(@PathVariable String
+	// locale,
+	// @PathVariable int turnoverId, @PathVariable boolean checkout,
+	// @PathVariable boolean kitchen)
+	// throws Exception {
+	// return printOrders(locale, turnoverId, false);
+	// }
 
 	// 更新turnover
 	@RequestMapping(value = "turnover", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
@@ -194,6 +208,15 @@ public class HomeController {
 		customerManager.remove(t);
 		BooleanExchange exchange = new BooleanExchange();
 		exchange.setModel(true);
+		return exchange;
+	}
+
+	// GET turnover by turnoverId with total price.
+	@RequestMapping(value = "turnover/totalPrice/{turnoverId}", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody MapExchange<String, Object> getTurnoverWithTotalPrice(@PathVariable int turnoverId) {
+		Map<String, Object> map = customerManager.getTurnoverWithTotalPrice(turnoverId);
+		MapExchange<String, Object> exchange = new MapExchange<String, Object>();
+		exchange.setModel(map);
 		return exchange;
 	}
 

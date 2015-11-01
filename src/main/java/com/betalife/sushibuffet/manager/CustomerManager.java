@@ -1,13 +1,10 @@
 package com.betalife.sushibuffet.manager;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +32,9 @@ import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.TakeawayExt;
 import com.betalife.sushibuffet.model.Turnover;
+import com.betalife.sushibuffet.print.PrintManager;
 import com.betalife.sushibuffet.util.Constant;
 import com.betalife.sushibuffet.util.LedgerTempletePOSUtil;
-import com.betalife.sushibuffet.util.OrderTempleteHtmlUtil;
-import com.betalife.sushibuffet.util.Printer;
-import com.betalife.sushibuffet.util.ReceiptTempletePOSUtil;
 
 @Service
 public class CustomerManager {
@@ -73,25 +68,16 @@ public class CustomerManager {
 	@Autowired
 	private OrderAttributionMapper orderAttributionMapper;
 
-	@Resource(name = "printer")
-	private Printer printer;
-
-	@Autowired
-	private ReceiptTempletePOSUtil receiptTempletePOSUtil;
-
-	@Autowired
-	private OrderTempleteHtmlUtil orderTempleteHtmlUtil;
-
 	@Autowired
 	private LedgerTempletePOSUtil ledgerTempletePOSUtil;
 
 	@Value("${order.locale}")
 	private String locale;
 
-	@Value("${print.times}")
-	private int times;
-
 	private Constant constant;
+
+	@Autowired
+	private PrintManager printManager;
 
 	@Transactional(rollbackFor = Exception.class)
 	public Turnover openTable(Turnover turnover) {
@@ -99,6 +85,23 @@ public class CustomerManager {
 		turnoverMapper.insert(turnover);
 
 		return turnoverMapper.select(turnover);
+	}
+
+	public Turnover get(Turnover turnover) {
+		return turnoverMapper.select(turnover);
+	}
+
+	public Map<String, Object> getTurnoverWithTotalPrice(int turnoverId) {
+		Turnover turnover = new Turnover();
+		turnover.setId(turnoverId);
+		turnover = get(turnover);
+
+		Order order = new Order();
+		order.setTurnover(turnover);
+		List<Order> orders = getOrders(order);
+		Map<String, Object> map = ledgerTempletePOSUtil.buildParam(null, orders, null);
+		map.put("turnover", turnover);
+		return map;
 	}
 
 	public List<Category> getCategoriesByParentId(Category category) {
@@ -144,12 +147,13 @@ public class CustomerManager {
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	public Turnover takeOrders(List<Order> orders) throws Exception {
+	public Turnover takeOrders(int turnoverId, List<Order> orders, boolean isPrint) throws Exception {
 		if (CollectionUtils.isEmpty(orders)) {
 			throw new IllegalArgumentException("Check Failed: orders is empty.");
 		}
 
-		Turnover turnover = orders.get(0).getTurnover();
+		Turnover turnover = new Turnover();
+		turnover.setId(turnoverId);
 		turnover = turnoverMapper.select(turnover);
 		if (turnover == null) {
 			throw new IllegalArgumentException("Check Failed: turnover is empty.");
@@ -158,6 +162,7 @@ public class CustomerManager {
 		Date now = new Date();
 		for (Order o : orders) {
 			o.setCreated(now);
+			o.setTurnover(turnover);
 			orderMapper.insert(o);
 
 			List<OrderAttribution> orderAttributions = o.getOrderAttributions();
@@ -168,14 +173,9 @@ public class CustomerManager {
 			}
 		}
 
-		List<byte[]> imgs = orderTempleteHtmlUtil.format_order_lines(orders, locale);
-		List<Object> list = new ArrayList<Object>();
-		for (byte[] img : imgs) {
-			list.add(img);
-			list.add(printer.getCutPaper());
+		if (isPrint) {
+			printManager.printOrders(turnover, orders, locale, false);
 		}
-		print(list, false, times);
-
 		return turnover;
 	}
 
@@ -222,12 +222,9 @@ public class CustomerManager {
 			return null;
 		}
 		fillOrderAttribution(locale, orders);
-		Map<String, Object> map = ledgerTempletePOSUtil.buildParam(orders);
-		String html = ledgerTempletePOSUtil.format(map);
-		List<Object> list = new ArrayList<Object>();
-		list.add(html);
-		list.add(printer.getCutPaper());
-		print(list, false, 1);
+
+		Map<String, Object> map = ledgerTempletePOSUtil.buildParam(null, orders, null);
+		printManager.printLedger(map);
 		return map;
 	}
 
@@ -288,14 +285,10 @@ public class CustomerManager {
 		}
 		fillOrderAttribution(model.getLocale(), orders);
 
-		List<Object> list = new ArrayList<Object>();
+		Turnover turnover = turnoverMapper.select(model.getTurnover());
+
 		if (kitchen) {
-			List<byte[]> imgs = orderTempleteHtmlUtil.format_order_lines(orders, locale);
-			for (byte[] img : imgs) {
-				list.add(img);
-				list.add(printer.getCutPaper());
-			}
-			print(list, false, times);
+			printManager.printOrders(turnover, orders, locale, false);
 		} else {
 			// productId
 			Map<Integer, Order> map = new HashMap<Integer, Order>();
@@ -326,19 +319,9 @@ public class CustomerManager {
 					}
 				}
 			}
-			Collection<Order> values = map.values();
 
-			Turnover turnover = turnoverMapper.select(model.getTurnover());
-			String content = receiptTempletePOSUtil.format_receipt_lines(new ArrayList<Order>(values),
-					model.getLocale(), turnover);
-			list.add(content);
-			list.add(printer.getCutPaper());
-			print(list, true, times);
+			printManager.printReceipt(turnover, new ArrayList<Order>(map.values()), model.getLocale(), true);
 		}
-	}
-
-	synchronized private void print(List<?> list, boolean logo, int times) throws Exception {
-		printer.print(list, logo, times);
 	}
 
 	public List<Order> selectOrders(List<Order> orders) {

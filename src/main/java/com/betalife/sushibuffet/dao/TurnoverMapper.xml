@@ -22,7 +22,7 @@
 
 	<select id="select" parameterType="Turnover" resultType="Turnover">
 		SELECT
-		id, table_id, discount, checkout, takeaway_id, payment
+		id, table_id, discount, checkout, takeaway_id, payment, first_table_id, created, updated
 		FROM turnover
 		WHERE id=#{id}
 	</select>

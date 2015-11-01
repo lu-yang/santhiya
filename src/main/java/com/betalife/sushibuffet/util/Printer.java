@@ -12,5 +12,7 @@ public interface Printer {
 
 	void setLogo(String logo);
 
+	void setLogicName(String logicName);
+
 	String getCutPaper();
 }

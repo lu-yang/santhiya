@@ -33,6 +33,8 @@
 	
 	<util:properties id="constants" location="classpath:constants.properties" />
 	
+	<util:properties id="printers" location="classpath:printers.properties" />
+	
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />

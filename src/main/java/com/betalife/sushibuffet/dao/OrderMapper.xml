@@ -38,7 +38,7 @@
 
 	<select id="selectExtOrdersByTurnover" parameterType="Order" resultMap="orderExtResult">
 		SELECT o.id,o.`count`,o.turnover_id,o.product_id,t.checkout,o.updated,o.created,p.product_num, t.discount, t.payment, 
-			p.taxgroup_id,t.table_id,p.category_id,p.num,p.product_price,p.thumb,m.NAME product_name,m2.NAME category_name 
+			p.taxgroup_id,t.table_id,p.category_id,p.num,p.product_price,p.thumb,m.NAME, m2.NAME category_name 
 		FROM `order` o, turnover t, 
 			product p LEFT JOIN multilang m ON m.id = CONCAT('p', p.id) AND m.locale = #{locale},
 			category c LEFT JOIN multilang m2 ON m2.id = CONCAT('c', c.id) AND m2.locale = #{locale} 

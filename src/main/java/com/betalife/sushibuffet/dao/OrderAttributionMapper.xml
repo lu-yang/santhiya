@@ -6,6 +6,9 @@
 	
 	<resultMap id="orderAttributionResult" type="OrderAttribution">
 		<id property="id" column="id" />
+		<result property="count" column="count" />
+		<result property="created" column="created" />
+		<result property="updated" column="updated" />
 		<result property="orderId" column="order_id" />
 		<association property="attribution" javaType="Attribution">
 			<id property="id" column="attribution_id" />
@@ -16,7 +19,7 @@
 	
 	<select id="selectByOrderId" parameterType="Order" resultMap="orderAttributionResult">
 		SELECT
-			oa.id, oa.order_id, oa.attribution_id,  a.attribution_price, m.NAME
+			oa.id, oa.order_id, oa.count, oa.attribution_id,  a.attribution_price, m.NAME
 		FROM
 			orderattribution oa, attribution a LEFT JOIN multilang m ON m.id = CONCAT('a', a.id) AND m.locale = #{locale}
 		WHERE 
@@ -26,7 +29,7 @@
 	
 	<select id="selectByOrderIds" resultMap="orderAttributionResult">
 		SELECT
-			oa.id, oa.order_id, oa.attribution_id,  a.attribution_price, m.NAME
+			oa.id, oa.order_id, oa.count, oa.attribution_id,  a.attribution_price, m.NAME
 		FROM
 			orderattribution oa, attribution a LEFT JOIN multilang m ON m.id = CONCAT('a', a.id) AND m.locale = #{locale}
 		WHERE 
