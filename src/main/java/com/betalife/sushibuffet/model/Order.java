@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+
 public class Order extends BaseModel {
 	/**
 	 * 
@@ -110,9 +112,12 @@ public class Order extends BaseModel {
 		copy.turnover = turnover;
 		copy.created = created;
 		copy.updated = updated;
-		for (OrderAttribution one : orderAttributions) {
-			copy.orderAttributions.add(one.copy());
+		if (CollectionUtils.isNotEmpty(orderAttributions)) {
+			for (OrderAttribution one : orderAttributions) {
+				copy.addOrderAttribution(one.copy());
+			}
 		}
+
 		return copy;
 	}
 

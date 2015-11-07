@@ -13,12 +13,14 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
+import com.betalife.sushibuffet.model.Attribution;
 import com.betalife.sushibuffet.model.Category;
 import com.betalife.sushibuffet.model.Order;
+import com.betalife.sushibuffet.model.OrderAttribution;
 import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Turnover;
 
@@ -74,7 +76,7 @@ public class OrderTempleteHtmlUtil extends TempleteUtil {
 			map.put("tableNo", tableId);
 		}
 
-		Map<String, List<Map<String, String>>> barNameMap = new HashMap<String, List<Map<String, String>>>();
+		Map<String, List<Map<String, Object>>> barNameMap = new HashMap<String, List<Map<String, Object>>>();
 
 		for (Order order : orders) {
 			Product product = order.getProduct();
@@ -85,19 +87,35 @@ public class OrderTempleteHtmlUtil extends TempleteUtil {
 			}
 			String cateName = category.getName();
 			String barName = category.getBarName();
-			List<Map<String, String>> list = null;
+			List<Map<String, Object>> list = null;
 			if (barNameMap.containsKey(barName)) {
 				list = barNameMap.get(barName);
 			} else {
-				list = new ArrayList<Map<String, String>>();
+				list = new ArrayList<Map<String, Object>>();
 				barNameMap.put(barName, list);
 			}
 
-			Map<String, String> one = new HashMap<String, String>();
+			Map<String, Object> one = new HashMap<String, Object>();
 			one.put("pname", productMap.get(product.getId()).getProductName());
 			one.put("count", order.getCount() + "");
 			one.put("pnum", product.getProductNum());
 			one.put("cname", cateName);
+
+			List<Map<String, String>> attrList = new ArrayList<Map<String, String>>();
+			one.put("attrList", attrList);
+
+			List<OrderAttribution> orderAttributions = order.getOrderAttributions();
+			if (CollectionUtils.isNotEmpty(orderAttributions)) {
+				for (OrderAttribution oa : orderAttributions) {
+					Attribution attr = oa.getAttribution();
+					Map<String, String> attrMap = new HashMap<String, String>();
+					attrList.add(attrMap);
+					attrMap.put("attrName", attr.getAttributionName());
+					int aCount = oa.getCount();
+					attrMap.put("aCount", aCount + "");
+				}
+			}
+
 			list.add(one);
 		}
 

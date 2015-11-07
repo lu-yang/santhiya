@@ -10,9 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import com.betalife.sushibuffet.model.Attribution;
 import com.betalife.sushibuffet.model.Category;
@@ -70,7 +70,7 @@ public class ReceiptTempletePOSUtil extends TempletePOSUtil {
 			one.put("attrList", attrList);
 
 			List<OrderAttribution> orderAttributions = order.getOrderAttributions();
-			if (!CollectionUtils.isEmpty(orderAttributions)) {
+			if (CollectionUtils.isNotEmpty(orderAttributions)) {
 				for (OrderAttribution oa : orderAttributions) {
 					Attribution attr = oa.getAttribution();
 					Map<String, String> attrMap = new HashMap<String, String>();

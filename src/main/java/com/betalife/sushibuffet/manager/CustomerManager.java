@@ -6,13 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import com.betalife.sushibuffet.dao.AttributionGroupMapper;
 import com.betalife.sushibuffet.dao.CategoryMapper;
@@ -137,12 +137,14 @@ public class CustomerManager {
 		params.put("ids", map.keySet());
 		params.put("locale", product.getLocale());
 		List<AttributionGroup> attributionGroups = attributionGroupMapper.selectByProductIds(params);
-
-		for (AttributionGroup one : attributionGroups) {
-			int productId = one.getProductId();
-			Product parent = map.get(productId);
-			parent.addAttribution(one.getAttribution());
+		if (CollectionUtils.isNotEmpty(attributionGroups)) {
+			for (AttributionGroup one : attributionGroups) {
+				int productId = one.getProductId();
+				Product parent = map.get(productId);
+				parent.addAttribution(one.getAttribution());
+			}
 		}
+
 		return products;
 	}
 
@@ -166,10 +168,12 @@ public class CustomerManager {
 			orderMapper.insert(o);
 
 			List<OrderAttribution> orderAttributions = o.getOrderAttributions();
-			for (OrderAttribution oa : orderAttributions) {
-				oa.setOrderId(o.getId());
-				oa.setCreated(now);
-				orderAttributionMapper.insert(oa);
+			if (CollectionUtils.isNotEmpty(orderAttributions)) {
+				for (OrderAttribution oa : orderAttributions) {
+					oa.setOrderId(o.getId());
+					oa.setCreated(now);
+					orderAttributionMapper.insert(oa);
+				}
 			}
 		}
 
@@ -205,12 +209,14 @@ public class CustomerManager {
 		params.put("ids", map.keySet());
 		params.put("locale", locale);
 		List<OrderAttribution> orderAttributions = orderAttributionMapper.selectByOrderIds(params);
-
-		for (OrderAttribution one : orderAttributions) {
-			int orderId = one.getOrderId();
-			Order parent = map.get(orderId);
-			parent.addOrderAttribution(one);
+		if (CollectionUtils.isNotEmpty(orderAttributions)) {
+			for (OrderAttribution one : orderAttributions) {
+				int orderId = one.getOrderId();
+				Order parent = map.get(orderId);
+				parent.addOrderAttribution(one);
+			}
 		}
+
 	}
 
 	public Map<String, Object> getOrdersByDate(Date from, Date to) throws Exception {
@@ -300,23 +306,28 @@ public class CustomerManager {
 					Order one = map.get(id);
 					one.setCount(one.getCount() + order.getCount());
 					List<OrderAttribution> orderAttributions = order.getOrderAttributions();
-					for (OrderAttribution orderAttribution : orderAttributions) {
-						String key = id + "-" + orderAttribution.getId();
-						if (attMap.containsKey(key)) {
-							OrderAttribution value = attMap.get(key);
-							value.setCount(value.getCount() + orderAttribution.getCount());
-						} else {
-							one.addOrderAttribution(orderAttribution);
-							attMap.put(key, orderAttribution);
+					if (CollectionUtils.isNotEmpty(orderAttributions)) {
+						for (OrderAttribution orderAttribution : orderAttributions) {
+							String key = id + "-" + orderAttribution.getId();
+							if (attMap.containsKey(key)) {
+								OrderAttribution value = attMap.get(key);
+								value.setCount(value.getCount() + orderAttribution.getCount());
+							} else {
+								one.addOrderAttribution(orderAttribution);
+								attMap.put(key, orderAttribution);
+							}
 						}
 					}
 				} else {
 					Order one = order.copy();
 					map.put(id, one);
 					List<OrderAttribution> orderAttributions = one.getOrderAttributions();
-					for (OrderAttribution orderAttribution : orderAttributions) {
-						attMap.put(id + "-" + orderAttribution.getId(), orderAttribution);
+					if (CollectionUtils.isNotEmpty(orderAttributions)) {
+						for (OrderAttribution orderAttribution : orderAttributions) {
+							attMap.put(id + "-" + orderAttribution.getId(), orderAttribution);
+						}
 					}
+
 				}
 			}
 
