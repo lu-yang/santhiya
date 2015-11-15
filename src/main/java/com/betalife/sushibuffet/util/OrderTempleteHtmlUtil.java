@@ -101,18 +101,17 @@ public class OrderTempleteHtmlUtil extends TempleteUtil {
 			one.put("pnum", product.getProductNum());
 			one.put("cname", cateName);
 
-			List<Map<String, String>> attrList = new ArrayList<Map<String, String>>();
-			one.put("attrList", attrList);
-
 			List<OrderAttribution> orderAttributions = order.getOrderAttributions();
 			if (CollectionUtils.isNotEmpty(orderAttributions)) {
+				List<Map<String, String>> attrList = new ArrayList<Map<String, String>>();
+				one.put("attrList", attrList);
 				for (OrderAttribution oa : orderAttributions) {
 					Attribution attr = oa.getAttribution();
 					Map<String, String> attrMap = new HashMap<String, String>();
 					attrList.add(attrMap);
 					attrMap.put("attrName", attr.getAttributionName());
 					int aCount = oa.getCount();
-					attrMap.put("aCount", aCount + "");
+					attrMap.put("attrCount", aCount + "");
 				}
 			}
 
@@ -126,6 +125,8 @@ public class OrderTempleteHtmlUtil extends TempleteUtil {
 			map.put("list", barNameMap.get(barname));
 
 			String html = format(map);
+			System.out.println("print order list:");
+			System.out.println(html);
 			html2ImageBytes.loadHtml(html);
 			byte[] bytes = html2ImageBytes.getBytes();
 			printerMap.put(barname, bytes);

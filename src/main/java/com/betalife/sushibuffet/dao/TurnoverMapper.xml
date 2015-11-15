@@ -27,6 +27,20 @@
 		WHERE id=#{id}
 	</select>
 	
+	<select id="selectList" parameterType="java.util.Map" resultType="Turnover">
+		<!-- 1. 所有 2. 堂吃. 3. 外卖 -->
+		SELECT
+		id, table_id, discount, checkout, takeaway_id, payment, first_table_id, created, updated
+		FROM turnover
+		WHERE 1=1 and 
+		<if test="type == 3">
+			(takeaway_id is not null or takeaway_id !=0)
+		</if>
+		<if test="type == 2">
+			(takeaway_id is null or takeaway_id =0)
+		</if>
+	</select>
+	
 	<delete id="delete" parameterType="Turnover">
 		DELETE FROM turnover
 		WHERE id=#{id}

@@ -91,6 +91,10 @@ public class CustomerManager {
 		return turnoverMapper.select(turnover);
 	}
 
+	public List<Turnover> getTurnoverList(Map<String, Object> params) {
+		return turnoverMapper.selectList(params);
+	}
+
 	public Map<String, Object> getTurnoverWithTotalPrice(int turnoverId) {
 		Turnover turnover = new Turnover();
 		turnover.setId(turnoverId);
@@ -102,6 +106,23 @@ public class CustomerManager {
 		Map<String, Object> map = ledgerTempletePOSUtil.buildParam(null, orders, null);
 		map.put("turnover", turnover);
 		return map;
+	}
+
+	public List<Map<String, Object>> getTurnoverListWithTotalPrice(Map<String, Object> params) {
+		List<Turnover> list = getTurnoverList(params);
+		if (CollectionUtils.isEmpty(list)) {
+			return null;
+		}
+		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+		for (Turnover turnover : list) {
+			Order order = new Order();
+			order.setTurnover(turnover);
+			List<Order> orders = getOrders(order);
+			Map<String, Object> map = ledgerTempletePOSUtil.buildParam(null, orders, null);
+			map.put("turnover", turnover);
+			result.add(map);
+		}
+		return result;
 	}
 
 	public List<Category> getCategoriesByParentId(Category category) {
@@ -141,7 +162,7 @@ public class CustomerManager {
 			for (AttributionGroup one : attributionGroups) {
 				int productId = one.getProductId();
 				Product parent = map.get(productId);
-				parent.addAttribution(one.getAttribution());
+				parent.addAttributionGroup(one);
 			}
 		}
 

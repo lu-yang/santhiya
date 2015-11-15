@@ -21,21 +21,21 @@ public class Product extends BaseModel {
 	private int productPrice;
 	private String locale;
 
-	private List<Attribution> attributions;
+	private List<AttributionGroup> attributionGroups;
 
-	public List<Attribution> getAttributions() {
-		return attributions;
+	public List<AttributionGroup> getAttributionGroups() {
+		return attributionGroups;
 	}
 
-	public void setAttributions(List<Attribution> attributions) {
-		this.attributions = attributions;
+	public void setAttributionGroups(List<AttributionGroup> attributionGroups) {
+		this.attributionGroups = attributionGroups;
 	}
 
-	public void addAttribution(Attribution att) {
-		if (attributions == null) {
-			attributions = new ArrayList<Attribution>();
+	public void addAttributionGroup(AttributionGroup group) {
+		if (attributionGroups == null) {
+			attributionGroups = new ArrayList<AttributionGroup>();
 		}
-		attributions.add(att);
+		attributionGroups.add(group);
 	}
 
 	public String getLocale() {

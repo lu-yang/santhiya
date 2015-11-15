@@ -2,6 +2,7 @@ package com.betalife.sushibuffet.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -218,6 +219,16 @@ public class HomeController {
 		MapExchange<String, Object> exchange = new MapExchange<String, Object>();
 		exchange.setModel(map);
 		return exchange;
+	}
+
+	// GET turnovers by type with total price. type: 1. 所有 2. 堂吃. 3. 外卖
+	@RequestMapping(value = "turnover/all/totalPrice/{type}", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody List<Map<String, Object>> getTurnoversWithTotalPrice(@PathVariable int type) {
+
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("type", type);
+		List<Map<String, Object>> list = customerManager.getTurnoverListWithTotalPrice(params);
+		return list;
 	}
 
 	// 打印指定时间内的总单

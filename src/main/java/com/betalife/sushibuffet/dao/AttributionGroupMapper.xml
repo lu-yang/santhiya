@@ -5,33 +5,52 @@
 <mapper namespace="com.betalife.sushibuffet.dao.AttributionGroupMapper">
 	
 	<resultMap id="attributionGroupResult" type="AttributionGroup">
-		<id property="id" column="id" />
+		<id property="id" column="attribution_group_id" />
 		<result property="productId" column="product_id" />
-		<association property="attribution" javaType="Attribution">
-			<id property="id" column="attribution_id" />
-			<result property="attributionPrice" column="attribution_price" />
-			<result property="attributionName" column="name" />
-		</association>
+		<result property="attributionGroupType" column="attribution_group_type" />
+		<result property="attributionGroupStatus" column="attribution_group_status" />
+		<result property="attributionGroupName" column="attribution_group_name" />
+	 	<collection property="attributions" ofType="Attribution">
+            <id property="id" column="attribution_id" />
+            <result property="attributionName" column="attribution_name" />
+            <result property="attributionPrice" column="attribution_price" />
+            <result property="attributionThumb" column="attribution_thumb" />
+            <result property="attributionGroupId" column="attribution_group_id" />
+        </collection>
 	</resultMap>
 	
 	<select id="selectByProductId" parameterType="Product" resultMap="attributionGroupResult">
 		SELECT
-			ag.id, ag.product_id, ag.attribution_id,  a.attribution_price, m.NAME
+			aga.attribution_group_id, ag.attribution_group_type, ag.attribution_group_status,
+			aga.attribution_id,  a.attribution_price, a.attribution_thumb,
+			agm.NAME attribution_group_name, am.NAME attribution_name,
+			pag.product_id
 		FROM
-			attributiongroup ag, attribution a LEFT JOIN multilang m ON m.id = CONCAT('a', a.id) AND m.locale = #{locale}
+			attributiongroup ag LEFT JOIN multilang agm ON agm.id = CONCAT('ag', ag.id) AND agm.locale = #{locale}, 
+			attribution a LEFT JOIN multilang am ON am.id = CONCAT('a', a.id) AND am.locale = #{locale},
+			attributiongroupattribution aga, productattributiongroup pag
 		WHERE 
-			ag.product_id = #{id} AND
-			ag.attribution_id = a.id
+			pag.attribution_group_id = ag.id AND 
+			ag.id = aga.attribution_group_id AND 	
+			aga.attribution_id= a.id AND	
+			pag.product_id = #{id} 
 	</select>
 	
 	<select id="selectByProductIds" resultMap="attributionGroupResult">
 		SELECT
-			ag.id, ag.product_id, ag.attribution_id,  a.attribution_price, m.NAME
+			aga.attribution_group_id, ag.attribution_group_type, ag.attribution_group_status,
+			aga.attribution_id,  a.attribution_price, a.attribution_thumb,
+			agm.NAME attribution_group_name, am.NAME attribution_name,
+			pag.product_id
 		FROM
-			attributiongroup ag, attribution a LEFT JOIN multilang m ON m.id = CONCAT('a', a.id) AND m.locale = #{locale}
+			attributiongroup ag LEFT JOIN multilang agm ON agm.id = CONCAT('ag', ag.id) AND agm.locale = #{locale}, 
+			attribution a LEFT JOIN multilang am ON am.id = CONCAT('a', a.id) AND am.locale = #{locale},
+			attributiongroupattribution aga, productattributiongroup pag
 		WHERE 
-			ag.attribution_id = a.id AND 
-			ag.product_id in
+			pag.attribution_group_id = ag.id AND 
+			ag.id = aga.attribution_group_id AND 	
+			aga.attribution_id= a.id AND	
+			pag.product_id in
 			<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
 		    <!-- http://my.oschina.net/linuxred/blog/38802 foreach 说明 -->
 			#{item}

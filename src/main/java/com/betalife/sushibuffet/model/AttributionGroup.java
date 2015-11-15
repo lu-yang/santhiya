@@ -1,5 +1,8 @@
 package com.betalife.sushibuffet.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AttributionGroup extends BaseModel {
 	/**
 	 * 
@@ -10,7 +13,52 @@ public class AttributionGroup extends BaseModel {
 
 	private int productId;
 
-	private Attribution attribution;
+	private List<Attribution> attributions;
+
+	private int attributionGroupType;
+
+	private int attributionGroupStatus;
+
+	private String attributionGroupName;
+
+	public String getAttributionGroupName() {
+		return attributionGroupName;
+	}
+
+	public void setAttributionGroupName(String attributionGroupName) {
+		this.attributionGroupName = attributionGroupName;
+	}
+
+	public int getAttributionGroupType() {
+		return attributionGroupType;
+	}
+
+	public void setAttributionGroupType(int attributionGroupType) {
+		this.attributionGroupType = attributionGroupType;
+	}
+
+	public int getAttributionGroupStatus() {
+		return attributionGroupStatus;
+	}
+
+	public void setAttributionGroupStatus(int attributionGroupStatus) {
+		this.attributionGroupStatus = attributionGroupStatus;
+	}
+
+	public List<Attribution> getAttributions() {
+		return attributions;
+	}
+
+	public void setAttributions(List<Attribution> attributions) {
+		this.attributions = attributions;
+	}
+
+	public void addAttribution(Attribution att) {
+		if (attributions == null) {
+			attributions = new ArrayList<Attribution>();
+		}
+		attributions.add(att);
+	}
 
 	public String getLocale() {
 		return locale;
@@ -28,17 +76,8 @@ public class AttributionGroup extends BaseModel {
 		this.productId = productId;
 	}
 
-	public Attribution getAttribution() {
-		return attribution;
-	}
-
-	public void setAttribution(Attribution attribution) {
-		this.attribution = attribution;
-	}
-
 	@Override
 	public String toString() {
-		return "AttributionGroup [attribution=" + attribution + "], [productId=" + productId + "]" + ", id="
-				+ id + "]" + ", locale=" + locale;
+		return "AttributionGroup [productId=" + productId + "]" + ", id=" + id + "]" + ", locale=" + locale;
 	}
 }

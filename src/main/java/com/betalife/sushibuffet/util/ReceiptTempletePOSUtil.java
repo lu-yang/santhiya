@@ -66,20 +66,20 @@ public class ReceiptTempletePOSUtil extends TempletePOSUtil {
 			one.put("price", DodoroUtil.getDisplayPrice(productPrice));
 
 			int attSum = 0;
-			List<Map<String, String>> attrList = new ArrayList<Map<String, String>>();
-			one.put("attrList", attrList);
 
 			List<OrderAttribution> orderAttributions = order.getOrderAttributions();
 			if (CollectionUtils.isNotEmpty(orderAttributions)) {
+				List<Map<String, String>> attrList = new ArrayList<Map<String, String>>();
+				one.put("attrList", attrList);
 				for (OrderAttribution oa : orderAttributions) {
 					Attribution attr = oa.getAttribution();
 					Map<String, String> attrMap = new HashMap<String, String>();
 					attrList.add(attrMap);
 					attrMap.put("attrName", attr.getAttributionName());
 					int aCount = oa.getCount();
-					attrMap.put("aCount", aCount + "");
+					attrMap.put("attrCount", aCount + "");
 					int attrPrice = attr.getAttributionPrice();
-					one.put("attrPrice", DodoroUtil.getDisplayPrice(attrPrice));
+					attrMap.put("attrPrice", DodoroUtil.getDisplayPrice(attrPrice));
 					attSum += aCount * attrPrice;
 				}
 			}

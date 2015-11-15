@@ -11,6 +11,13 @@ body{font-family:Arial;font-size:13px;width:220px;}
 			<#list list as one>
 				${one['count']} 份&nbsp;&nbsp;${one['cname']}&nbsp;&nbsp;${one['pname']}<br>
 				
+				<!-- attribution  -->
+				<#if one.attrList??>
+				<#list one.attrList as attr>
+					${attr.attrCount!""} 份&nbsp;&nbsp;${attr.attrName!""}<br>
+				</#list><br>
+				</#if>
+				<!-- attribution  -->
 			</#list><br>
 			<hr><br><br>
 				

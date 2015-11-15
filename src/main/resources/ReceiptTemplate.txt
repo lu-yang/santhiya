@@ -13,6 +13,16 @@
 
 <#list list as one>
 \u001b|N${one['pnum']}. ${one['pname']} x ${one['count']}
+
+<#-- attribution  -->
+<#if one.attrList??>
+<#list one.attrList as attr>
+\u001b|N${attr.attrName!""} x ${attr.attrCount!""} * ${attr.attrPrice!""}
+</#list>
+\u001b|N\u001b|rA\u001b|uC${one.attrSumPrice!""} Eur\u001b|N\n
+</#if>
+<#-- attribution  -->
+
 \u001b|N${one['cname']} \u001b|rA\u001b|uC${one['subtotal']} Eur\u001b|N\n
 </#list>
 \u001b|Nt.v.a / b.t.w / v.a.t\n

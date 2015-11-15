@@ -8,9 +8,29 @@ public class Attribution extends BaseModel {
 
 	private String locale;
 
+	private String attributionThumb;
+
 	private int attributionPrice;
 
 	private String attributionName;
+
+	private int attributionGroupId;
+
+	public String getAttributionThumb() {
+		return attributionThumb;
+	}
+
+	public void setAttributionThumb(String attributionThumb) {
+		this.attributionThumb = attributionThumb;
+	}
+
+	public int getAttributionGroupId() {
+		return attributionGroupId;
+	}
+
+	public void setAttributionGroupId(int attributionGroupId) {
+		this.attributionGroupId = attributionGroupId;
+	}
 
 	public String getLocale() {
 		return locale;
