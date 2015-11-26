@@ -10,11 +10,13 @@ public interface OrderMapper {
 
 	List<Order> selectOrdersByTurnover(Order o);
 
-	List<Order> selectExtOrdersByTurnover(Order o);	
+	List<Order> selectExtOrdersByTurnover(Order o);
 
 	List<Order> selectOrders(Map<String, Object> params);
 
 	void insert(Order o);
+
+	Order select(Order o);
 
 	List<Order> selectOrdersByDate(Map<String, Date> map);
 

@@ -84,6 +84,14 @@
 		AND p.active=true
 		Order by o.created
 	</select>
+	
+	
+	<select id="select" parameterType="Order" resultType="Order">
+		SELECT
+		id, turnover_id, product_id, `count`, created, updated, `status`, modified
+		FROM `order`
+		WHERE id=#{id}
+	</select>
 
 	<insert id="insert" parameterType="Order" useGeneratedKeys="true"
 		keyProperty="id">
@@ -95,7 +103,7 @@
 
 	<update id="update" parameterType="Order">
 		UPDATE `order`
-		SET `count`=#{count}, updated=NOW()
+		SET `status`=#{status}, updated=NOW()
 		WHERE id=#{id}
 	</update>
 

@@ -23,6 +23,7 @@ import com.betalife.sushibuffet.exchange.CategoryListExchange;
 import com.betalife.sushibuffet.exchange.ConstantExchange;
 import com.betalife.sushibuffet.exchange.DiningtableListExchange;
 import com.betalife.sushibuffet.exchange.DodoroException;
+import com.betalife.sushibuffet.exchange.ListExchange;
 import com.betalife.sushibuffet.exchange.MapExchange;
 import com.betalife.sushibuffet.exchange.OrderListExchange;
 import com.betalife.sushibuffet.exchange.ProductListExchange;
@@ -223,12 +224,15 @@ public class HomeController {
 
 	// GET turnovers by type with total price. type: 1. 所有 2. 堂吃. 3. 外卖
 	@RequestMapping(value = "turnover/all/totalPrice/{type}", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody List<Map<String, Object>> getTurnoversWithTotalPrice(@PathVariable int type) {
+	public @ResponseBody ListExchange<Map<String, Object>> getTurnoversWithTotalPrice(
+			@PathVariable int type) {
 
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("type", type);
 		List<Map<String, Object>> list = customerManager.getTurnoverListWithTotalPrice(params);
-		return list;
+		ListExchange<Map<String, Object>> exchange = new ListExchange<Map<String, Object>>();
+		exchange.setModel(list);
+		return exchange;
 	}
 
 	// 打印指定时间内的总单
@@ -289,6 +293,42 @@ public class HomeController {
 		BooleanExchange exchange = new BooleanExchange();
 		exchange.setModel(true);
 		return exchange;
+	}
+
+	@RequestMapping(value = "kitchen/cold/orders", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody OrderListExchange getColddish() {
+		List<Order> list = customerManager.selectColdDishes();
+		OrderListExchange exchange = new OrderListExchange();
+		exchange.setList(list.toArray(new Order[0]));
+		return exchange;
+	}
+
+	@RequestMapping(value = "kitchen/hot/orders", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody OrderListExchange getHotdish() {
+		List<Order> list = customerManager.selectHotDishes();
+		OrderListExchange exchange = new OrderListExchange();
+		exchange.setList(list.toArray(new Order[0]));
+		return exchange;
+	}
+
+	@RequestMapping(value = "order/reminder/{id}", method = RequestMethod.PUT, produces = "application/json")
+	public @ResponseBody BooleanExchange reminderOrder(@PathVariable int id) {
+		customerManager.reminderOrder(id);
+		BooleanExchange exchange = new BooleanExchange();
+		exchange.setModel(true);
+		return exchange;
+	}
+
+	@RequestMapping(value = "order/serve/hot/{id}", method = RequestMethod.PUT, produces = "application/json")
+	public @ResponseBody OrderListExchange serveHotOrder(@PathVariable int id) {
+		customerManager.serveOrder(id);
+		return getHotdish();
+	}
+
+	@RequestMapping(value = "order/serve/cold/{id}", method = RequestMethod.PUT, produces = "application/json")
+	public @ResponseBody OrderListExchange serveColdOrder(@PathVariable int id) {
+		customerManager.serveOrder(id);
+		return getColddish();
 	}
 
 	@ExceptionHandler(Exception.class)

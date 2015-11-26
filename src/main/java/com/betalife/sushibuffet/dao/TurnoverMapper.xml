@@ -32,12 +32,12 @@
 		SELECT
 		id, table_id, discount, checkout, takeaway_id, payment, first_table_id, created, updated
 		FROM turnover
-		WHERE 1=1 and 
+		WHERE 1=1  
 		<if test="type == 3">
-			(takeaway_id is not null or takeaway_id !=0)
+			and (takeaway_id is not null and takeaway_id !=0)
 		</if>
 		<if test="type == 2">
-			(takeaway_id is null or takeaway_id =0)
+			and (takeaway_id is null or takeaway_id =0)
 		</if>
 	</select>
 	

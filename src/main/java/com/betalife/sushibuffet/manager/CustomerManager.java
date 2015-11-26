@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.betalife.sushibuffet.dao.AttributionGroupMapper;
 import com.betalife.sushibuffet.dao.CategoryMapper;
 import com.betalife.sushibuffet.dao.DiningtableMapper;
+import com.betalife.sushibuffet.dao.KitchenOrderMapper;
 import com.betalife.sushibuffet.dao.OrderAttributionMapper;
 import com.betalife.sushibuffet.dao.OrderMapper;
 import com.betalife.sushibuffet.dao.ProductMapper;
@@ -63,6 +64,9 @@ public class CustomerManager {
 	private TakeawayMapper takeawayMapper;
 
 	@Autowired
+	private KitchenOrderMapper kitchenOrderMapper;
+
+	@Autowired
 	private AttributionGroupMapper attributionGroupMapper;
 
 	@Autowired
@@ -73,6 +77,9 @@ public class CustomerManager {
 
 	@Value("${order.locale}")
 	private String locale;
+
+	@Value("${kitchen.locale}")
+	private String kitchenLocale;
 
 	private Constant constant;
 
@@ -382,4 +389,32 @@ public class CustomerManager {
 		takeawayMapper.deleteAll();
 	}
 
+	public List<Order> selectColdDishes() {
+		List<Order> list = kitchenOrderMapper.selectColdDishes();
+		fillOrderAttribution(kitchenLocale, list);
+		return list;
+	}
+
+	public List<Order> selectHotDishes() {
+		List<Order> list = kitchenOrderMapper.selectHotDishes();
+		fillOrderAttribution(kitchenLocale, list);
+		return list;
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public void reminderOrder(int id) {
+		Order o = new Order();
+		o.setId(id);
+		o = orderMapper.select(o);
+		o.setStatus(o.getStatus() + 1);
+		orderMapper.update(o);
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public void serveOrder(int id) {
+		Order o = new Order();
+		o.setId(id);
+		o.setStatus(0);
+		orderMapper.update(o);
+	}
 }

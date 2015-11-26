@@ -23,6 +23,9 @@ public class Order extends BaseModel {
 	private Date created;
 	private Date updated;
 
+	private int modified;
+	private int status;
+
 	private List<OrderAttribution> orderAttributions;
 
 	// public int getTurnoverId() {
@@ -43,6 +46,22 @@ public class Order extends BaseModel {
 
 	public Date getCreated() {
 		return created;
+	}
+
+	public int getModified() {
+		return modified;
+	}
+
+	public void setModified(int modified) {
+		this.modified = modified;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
 	}
 
 	public List<OrderAttribution> getOrderAttributions() {
@@ -112,6 +131,8 @@ public class Order extends BaseModel {
 		copy.turnover = turnover;
 		copy.created = created;
 		copy.updated = updated;
+		copy.modified = modified;
+		copy.status = status;
 		if (CollectionUtils.isNotEmpty(orderAttributions)) {
 			for (OrderAttribution one : orderAttributions) {
 				copy.addOrderAttribution(one.copy());
