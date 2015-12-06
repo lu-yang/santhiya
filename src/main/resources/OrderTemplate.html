@@ -9,6 +9,14 @@ body{font-family:Arial;font-size:13px;width:220px;}
 
 			
 			<#list list as one>
+				<!-- 0:未修改数量；1：加菜；2：减菜；3：消菜 -->
+				<#if one.modified =1>
+				加菜
+				<#elseif one.modified =2>
+				减菜
+				<#elseif one.modified =3>
+				消菜
+				</#if>
 				${one['count']} 份&nbsp;&nbsp;${one['cname']}&nbsp;&nbsp;${one['pname']}<br>
 				
 				<!-- attribution  -->

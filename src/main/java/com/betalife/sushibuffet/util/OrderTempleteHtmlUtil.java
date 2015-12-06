@@ -97,9 +97,10 @@ public class OrderTempleteHtmlUtil extends TempleteUtil {
 
 			Map<String, Object> one = new HashMap<String, Object>();
 			one.put("pname", productMap.get(product.getId()).getProductName());
-			one.put("count", order.getCount() + "");
+			one.put("count", order.getCount() > 0 ? order.getCount() : -order.getCount());
 			one.put("pnum", product.getProductNum());
 			one.put("cname", cateName);
+			one.put("modified", order.getModified());
 
 			List<OrderAttribution> orderAttributions = order.getOrderAttributions();
 			if (CollectionUtils.isNotEmpty(orderAttributions)) {

@@ -191,9 +191,27 @@ public class CustomerManager {
 
 		Date now = new Date();
 		for (Order o : orders) {
-			o.setCreated(now);
-			o.setTurnover(turnover);
-			orderMapper.insert(o);
+			if (o.getId() == 0) {
+				o.setCreated(now);
+				o.setTurnover(turnover);
+				orderMapper.insert(o);
+			} else {
+				Map<String, Integer> params = new HashMap<String, Integer>();
+				params.put("orderId", o.getId());
+				orderAttributionMapper.delete(params);
+
+				Order entity = orderMapper.select(o);
+				entity.setCount(entity.getCount() + o.getCount());
+				// 0:未修改数量；1：加菜；2：减菜；3：消菜
+				if (entity.getCount() == 0) {
+					orderMapper.delete(entity);
+					o.setOrderAttributions(null);
+					o.setModified(3);
+				} else {
+					orderMapper.update(entity);
+					o.setModified(o.getCount() > 0 ? 1 : 2);
+				}
+			}
 
 			List<OrderAttribution> orderAttributions = o.getOrderAttributions();
 			if (CollectionUtils.isNotEmpty(orderAttributions)) {
@@ -280,7 +298,9 @@ public class CustomerManager {
 		Order order = new Order();
 		order.setTurnover(t);
 		orderMapper.delete(order);
-		orderAttributionMapper.delete(order);
+		Map<String, Integer> params = new HashMap<String, Integer>();
+		params.put("turnoverId", t.getId());
+		orderAttributionMapper.delete(params);
 		turnoverMapper.delete(t);
 	}
 
@@ -401,6 +421,12 @@ public class CustomerManager {
 		return list;
 	}
 
+	public List<Order> selectServedDishes() {
+		List<Order> list = kitchenOrderMapper.selectServedDishes();
+		fillOrderAttribution(kitchenLocale, list);
+		return list;
+	}
+
 	@Transactional(rollbackFor = Exception.class)
 	public void reminderOrder(int id) {
 		Order o = new Order();
@@ -411,10 +437,12 @@ public class CustomerManager {
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	public void serveOrder(int id) {
+	public void serveOrder(int id, int status) {
 		Order o = new Order();
 		o.setId(id);
-		o.setStatus(0);
+		o = orderMapper.select(o);
+		o.setStatus(status);
 		orderMapper.update(o);
 	}
+
 }

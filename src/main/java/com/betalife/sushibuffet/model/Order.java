@@ -28,21 +28,15 @@ public class Order extends BaseModel {
 
 	private List<OrderAttribution> orderAttributions;
 
-	// public int getTurnoverId() {
-	// return turnoverId;
-	// }
-	//
-	// public void setTurnoverId(int turnoverId) {
-	// this.turnoverId = turnoverId;
-	// }
-	//
-	// public int getProductId() {
-	// return productId;
-	// }
-	//
-	// public void setProductId(int productId) {
-	// this.productId = productId;
-	// }
+	private Date served;
+
+	public Date getServed() {
+		return served;
+	}
+
+	public void setServed(Date served) {
+		this.served = served;
+	}
 
 	public Date getCreated() {
 		return created;

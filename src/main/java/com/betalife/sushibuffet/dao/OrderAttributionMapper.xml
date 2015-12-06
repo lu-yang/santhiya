@@ -49,12 +49,19 @@
 		(#{orderId}, #{attribution.id}, #{count}, #{created})
 	</insert>
 	
-	<delete id="delete" parameterType="Order">
+	<delete id="delete">
 		DELETE FROM `orderattribution`
-		WHERE order_id in 
-		(
-			select id from `order` where turnover_id=#{turnover.id}
-		)
+		WHERE 
+		<if test="turnoverId != null">
+			order_id in 
+				(
+					select id from `order` where turnover_id=#{turnoverId}
+				)
+		</if>
+		<if test="orderId != null">
+			order_id = #{orderId} 
+		</if>
+		
 	</delete>
 
 	<delete id="deleteAll">

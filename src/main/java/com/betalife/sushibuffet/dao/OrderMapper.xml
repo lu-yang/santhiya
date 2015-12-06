@@ -103,7 +103,10 @@
 
 	<update id="update" parameterType="Order">
 		UPDATE `order`
-		SET `status`=#{status}, updated=NOW()
+		SET `status`=#{status}, updated=NOW(), count=#{count}, modified=#{modified}
+		<if test="status == 0">
+		, served = NOW()
+		</if>
 		WHERE id=#{id}
 	</update>
 

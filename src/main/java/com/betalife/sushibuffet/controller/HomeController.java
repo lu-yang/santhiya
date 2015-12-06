@@ -311,6 +311,14 @@ public class HomeController {
 		return exchange;
 	}
 
+	@RequestMapping(value = "kitchen/served/orders", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody OrderListExchange getServeddish() {
+		List<Order> list = customerManager.selectServedDishes();
+		OrderListExchange exchange = new OrderListExchange();
+		exchange.setList(list.toArray(new Order[0]));
+		return exchange;
+	}
+
 	@RequestMapping(value = "order/reminder/{id}", method = RequestMethod.PUT, produces = "application/json")
 	public @ResponseBody BooleanExchange reminderOrder(@PathVariable int id) {
 		customerManager.reminderOrder(id);
@@ -321,14 +329,32 @@ public class HomeController {
 
 	@RequestMapping(value = "order/serve/hot/{id}", method = RequestMethod.PUT, produces = "application/json")
 	public @ResponseBody OrderListExchange serveHotOrder(@PathVariable int id) {
-		customerManager.serveOrder(id);
+		customerManager.serveOrder(id, 0);
 		return getHotdish();
 	}
 
 	@RequestMapping(value = "order/serve/cold/{id}", method = RequestMethod.PUT, produces = "application/json")
 	public @ResponseBody OrderListExchange serveColdOrder(@PathVariable int id) {
-		customerManager.serveOrder(id);
+		customerManager.serveOrder(id, 0);
 		return getColddish();
+	}
+
+	@RequestMapping(value = "order/revert/{id}", method = RequestMethod.PUT, produces = "application/json")
+	public @ResponseBody Map<String, Object> revertOrder(@PathVariable int id) {
+		customerManager.serveOrder(id, 1);
+		return dashboard();
+	}
+
+	@RequestMapping(value = "kitchen/dashboard/", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody Map<String, Object> dashboard() {
+		List<Order> coldDishes = customerManager.selectColdDishes();
+		List<Order> hotDishes = customerManager.selectHotDishes();
+		List<Order> servedDishes = customerManager.selectServedDishes();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("coldDishes", coldDishes);
+		map.put("hotDishes", hotDishes);
+		map.put("servedDishes", servedDishes);
+		return map;
 	}
 
 	@ExceptionHandler(Exception.class)
