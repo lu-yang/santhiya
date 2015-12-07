@@ -9,6 +9,9 @@
 		<result property="count" column="count" />
 		<result property="created" column="created" />
 		<result property="updated" column="updated" />
+		<result property="served" column="served" />
+		<result property="status" column="status" />
+		<result property="modified" column="modified" />
 		<association property="turnover" javaType="Turnover">
 			<id property="id" column="turnover_id" />
 			<result property="checkout" column="checkout" />
@@ -37,8 +40,9 @@
 	</resultMap>
 
 	<select id="selectExtOrdersByTurnover" parameterType="Order" resultMap="orderExtResult">
-		SELECT o.id,o.`count`,o.turnover_id,o.product_id,t.checkout,o.updated,o.created,p.product_num, t.discount, t.payment, 
-			p.taxgroup_id,t.table_id,p.category_id,p.num,p.product_price,p.thumb,m.NAME, m2.NAME category_name 
+		SELECT o.id,o.`count`,o.turnover_id,o.product_id,t.checkout,o.updated,o.created,o.`status`, o.modified, o.served,
+			t.discount, t.payment, t.table_id, p.category_id, p.product_num, p.taxgroup_id,p.num,p.product_price,p.thumb,
+			m.NAME, m2.NAME category_name 
 		FROM `order` o, turnover t, 
 			product p LEFT JOIN multilang m ON m.id = CONCAT('p', p.id) AND m.locale = #{locale},
 			category c LEFT JOIN multilang m2 ON m2.id = CONCAT('c', c.id) AND m2.locale = #{locale} 
@@ -51,8 +55,8 @@
 	</select>
 
 	<select id="selectOrdersByTurnover" parameterType="Order" resultMap="orderResult">
-		SELECT o.id, o.`count`, o.turnover_id, o.product_id, t.checkout, o.updated, o.created, p.product_num, p.taxgroup_id,
-		t.table_id, p.category_id, p.num, p.product_price, p.thumb, m.NAME, t.discount, t.payment
+		SELECT o.id, o.`count`, o.turnover_id, o.product_id, t.checkout, o.updated, o.created, o.`status`, o.modified, o.served,
+			p.product_num, p.taxgroup_id, t.table_id, p.category_id, p.num, p.product_price, p.thumb, m.NAME, t.discount, t.payment
 		FROM `order` o,	turnover t, product p LEFT JOIN multilang m ON m.id = CONCAT('p', p.id) 	AND m.locale = #{locale}
 		WHERE o.turnover_id = #{turnover.id}
 		AND o.turnover_id = t.id
@@ -62,8 +66,8 @@
 	</select>
 
 	<select id="selectOrdersByDate" parameterType="map" resultMap="orderResult">
-		SELECT o.id, o.`count`, o.turnover_id, o.product_id, o.updated, o.created, p.taxgroup_id,
-		p.category_id, p.product_price, t.discount, 	t.checkout, 	t.takeaway_id, t.table_id, t.payment
+		SELECT o.id, o.`count`, o.turnover_id, o.product_id, o.updated, o.created, o.`status`, o.modified, o.served,
+			p.taxgroup_id, p.category_id, p.product_price, t.discount, t.checkout, t.takeaway_id, t.table_id, t.payment
 		FROM `order` o, turnover t, 	product p
 		WHERE o.turnover_id = t.id
 		AND o.product_id = p.id
@@ -71,8 +75,8 @@
 	</select>
 
 	<select id="selectOrders" resultMap="orderResult">
-		SELECT o.id, o.`count`, o.turnover_id, o.product_id, o.updated, o.created, t.table_id, t.payment, 
-			p.category_id, p.num, p.product_price, p.thumb, m.NAME
+		SELECT o.id, o.`count`, o.turnover_id, o.product_id, o.updated, o.created, o.`status`, o.modified, o.served, 
+			t.table_id, t.payment, p.category_id, p.num, p.product_price, p.thumb, m.NAME
 		FROM `order` o, turnover t, product p LEFT JOIN multilang m ON m.id = CONCAT('p', p.id) AND m.locale = #{locale}
 		WHERE o.id in
 		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
@@ -88,7 +92,7 @@
 	
 	<select id="select" parameterType="Order" resultType="Order">
 		SELECT
-		id, turnover_id, product_id, `count`, created, updated, `status`, modified
+		id, turnover_id, product_id, `count`, created, updated, `status`, modified, served
 		FROM `order`
 		WHERE id=#{id}
 	</select>
