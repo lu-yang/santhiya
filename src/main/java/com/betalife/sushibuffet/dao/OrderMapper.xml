@@ -114,9 +114,14 @@
 		WHERE id=#{id}
 	</update>
 
-	<delete id="delete" parameterType="Order">
+	<delete id="deleteByTurnoverId" parameterType="Order">
 		DELETE FROM `order`
 		WHERE turnover_id=#{turnover.id}
+	</delete>
+	
+	<delete id="delete" parameterType="Order">
+		DELETE FROM `order`
+		WHERE id=#{id}
 	</delete>
 
 	<delete id="deleteAll">

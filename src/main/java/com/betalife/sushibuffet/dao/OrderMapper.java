@@ -22,6 +22,8 @@ public interface OrderMapper {
 
 	void delete(Order o);
 
+	void deleteByTurnoverId(Order o);
+
 	void deleteAll();
 
 	void update(Order o);

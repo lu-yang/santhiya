@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -250,7 +251,28 @@ public class HomeController {
 	// 取所有外卖记录（当天的）
 	@RequestMapping(value = "takeaways", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody TakeawayListExchange takeaways() {
-		List<TakeawayExt> all = customerManager.getTakeaways();
+		Date today = new Date();
+		today = DateUtils.setHours(today, 0);
+		today = DateUtils.setMinutes(today, 0);
+		today = DateUtils.setSeconds(today, 0);
+		today = DateUtils.setMilliseconds(today, 0);
+		Date tomorrow = DateUtils.addDays(today, 1);
+
+		List<TakeawayExt> all = customerManager.getTakeaways(today, tomorrow);
+		TakeawayListExchange exchange = new TakeawayListExchange();
+		exchange.setList(all.toArray(new TakeawayExt[0]));
+		return exchange;
+	}
+
+	// 取外卖记录（指定日期的）
+	@RequestMapping(value = "takeaways/{from}/{to}", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody TakeawayListExchange takeaways(@PathVariable String from, @PathVariable String to)
+			throws Exception {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date fromDate = sdf.parse(from);
+		Date toDate = sdf.parse(to);
+
+		List<TakeawayExt> all = customerManager.getTakeaways(fromDate, toDate);
 		TakeawayListExchange exchange = new TakeawayListExchange();
 		exchange.setList(all.toArray(new TakeawayExt[0]));
 		return exchange;
@@ -283,6 +305,17 @@ public class HomeController {
 		customerManager.update(takeaway, checkout);
 		BooleanExchange exchange = new BooleanExchange();
 		exchange.setModel(true);
+		return exchange;
+	}
+
+	// 根据外卖id取外卖
+	@RequestMapping(value = "takeaway/{id}", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody TakeawayExchange takeaway(@PathVariable int id) {
+		Takeaway takeaway = new Takeaway();
+		takeaway.setId(id);
+		takeaway = customerManager.get(takeaway);
+		TakeawayExchange exchange = new TakeawayExchange();
+		exchange.setModel(takeaway);
 		return exchange;
 	}
 

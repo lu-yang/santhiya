@@ -1,6 +1,8 @@
 package com.betalife.sushibuffet.dao;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.TakeawayExt;
@@ -14,7 +16,7 @@ public interface TakeawayMapper {
 
 	void deleteAll();
 
-	List<TakeawayExt> selectTodayTakeaways();
+	List<TakeawayExt> selectAll(Map<String, Date> param);
 
-	Takeaway select(Takeaway t);
+	TakeawayExt select(Takeaway t);
 }

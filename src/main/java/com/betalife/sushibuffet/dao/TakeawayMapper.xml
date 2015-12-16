@@ -9,6 +9,10 @@
 		<result property="memo" column="memo" />
 		<result property="takeaway" column="takeaway" />
 		<result property="created" column="created" />
+		<result property="vaild" column="vaild" />
+		<result property="printed" column="printed" />
+		<result property="source" column="source" />
+		<result property="delivery" column="delivery" />
 		<association property="turnover" javaType="Turnover">
 			<id property="id" column="turnover_id" />
 			<result property="checkout" column="checkout" />
@@ -24,9 +28,8 @@
 
 	<insert id="insert" parameterType="Takeaway" useGeneratedKeys="true"
 		keyProperty="id">
-		INSERT INTO takeaway (memo, takeaway)
-		VALUES (#{memo},
-		#{takeaway})
+		INSERT INTO takeaway (memo, takeaway, vaild, printed, source, delivery)
+		VALUES (#{memo}, #{takeaway}, #{vaild}, #{printed}, #{source}, #{delivery})
 	</insert>
 
 	<update id="update" parameterType="Takeaway">
@@ -34,29 +37,32 @@
 		SET
 		memo=#{memo},
 		takeaway=#{takeaway},
+		vaild=#{vaild},
+		printed=#{printed},
+		source=#{source},
+		delivery=#{delivery},
 		updated=now()
 		WHERE id=#{id}
 	</update>
 
-	<select id="selectTodayTakeaways" resultMap="takeawayExtResult">
+	<select id="selectAll" resultMap="takeawayExtResult">
 		SELECT 
 		  SUM(o.COUNT* p.product_price) AS total,
-		  tn.id AS turnover_id, tn.discount, tn.checkout, tn.payment, ta.memo, ta.takeaway, ta.created, ta.id 
+		  tn.id AS turnover_id, tn.discount, tn.checkout, tn.payment, ta.memo, ta.takeaway, ta.created, ta.id, ta.vaild, ta.printed, ta.source, ta.delivery 
 		FROM
 		  `order` o, product p,  turnover tn, takeaway ta  
-		WHERE ta.created BETWEEN CURDATE() 
-		  AND DATE_ADD(CURDATE(), INTERVAL 1 DAY) 
+		WHERE ta.created BETWEEN #{from} AND #{to}
 		  AND tn.takeaway_id = ta.id 
 		  AND o.turnover_id = tn.id 
 		  AND o.product_id = p.id 
 		GROUP BY ta.id 
 		ORDER BY ta.created DESC ;	    
 	</select>
-
+	
 	<select id="select" parameterType="Takeaway" resultMap="takeawayResult">
 		SELECT
 		tor.id as turnover_id, tor.checkout, tor.takeaway_id, tor.discount, tor.payment
-		ta.created,ta.memo,ta.takeaway,ta.id
+		ta.created,ta.memo,ta.takeaway,ta.id, ta.vaild, ta.printed, ta.source, ta.delivery 
 		FROM
 		takeaway ta, turnover tor
 		WHERE ta.id=tor.takeaway_id

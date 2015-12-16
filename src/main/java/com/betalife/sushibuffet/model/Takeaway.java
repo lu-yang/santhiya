@@ -11,8 +11,43 @@ public class Takeaway extends BaseModel {
 	private Date updated;
 	private String memo;
 	private boolean takeaway;
-
+	private boolean vaild;
+	private boolean printed;
+	private int source;
+	private boolean delivery;
 	private Turnover turnover;
+
+	public boolean isDelivery() {
+		return delivery;
+	}
+
+	public void setDelivery(boolean delivery) {
+		this.delivery = delivery;
+	}
+
+	public boolean isVaild() {
+		return vaild;
+	}
+
+	public void setVaild(boolean vaild) {
+		this.vaild = vaild;
+	}
+
+	public boolean isPrinted() {
+		return printed;
+	}
+
+	public void setPrinted(boolean printed) {
+		this.printed = printed;
+	}
+
+	public int getSource() {
+		return source;
+	}
+
+	public void setSource(int source) {
+		this.source = source;
+	}
 
 	public Turnover getTurnover() {
 		return turnover;

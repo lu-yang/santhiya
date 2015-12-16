@@ -297,7 +297,7 @@ public class CustomerManager {
 	public void remove(Turnover t) {
 		Order order = new Order();
 		order.setTurnover(t);
-		orderMapper.delete(order);
+		orderMapper.deleteByTurnoverId(order);
 		Map<String, Integer> params = new HashMap<String, Integer>();
 		params.put("turnoverId", t.getId());
 		orderAttributionMapper.delete(params);
@@ -328,8 +328,15 @@ public class CustomerManager {
 		takeaway.setTurnover(turnover);
 	}
 
-	public List<TakeawayExt> getTakeaways() {
-		return takeawayMapper.selectTodayTakeaways();
+	public List<TakeawayExt> getTakeaways(Date from, Date to) {
+		Map<String, Date> param = new HashMap<String, Date>();
+		param.put("from", from);
+		param.put("to", to);
+		return takeawayMapper.selectAll(param);
+	}
+
+	public Takeaway get(Takeaway t) {
+		return takeawayMapper.select(t);
 	}
 
 	public void printOrders(Order model, boolean kitchen) throws Exception {
