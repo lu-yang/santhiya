@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.betalife.sushibuffet.dao.KitchenOrderMapper">
+
+	<resultMap id="kitchenOrder" type="OrderExt">
+		<id property="id" column="order_id" />
+		<result property="count" column="count" />
+		<result property="created" column="created" />
+		<result property="served" column="served" />
+		<result property="status" column="status" />
+		<association property="turnover" javaType="Turnover">
+			<id property="id" column="turnover_id" />
+			<result property="tableId" column="table_id" />
+		</association>
+		<association property="product" javaType="Product">
+			<id property="id" column="product_id" />
+			<result property="categoryId" column="category_id" />
+			<result property="productName" column="product_name" />
+			<result property="productNum" column="product_num" />
+		</association>
+		<association property="category" javaType="Category">
+			<id property="id" column="category_id" />
+			<result property="name" column="category_name" />
+			<result property="type" column="type" />			
+		</association>
+	</resultMap>
+	
+
+	<select id="selectHotDishes" resultMap="kitchenOrder">
+		SELECT * 
+		FROM hotdish;
+	</select>
+
+	<select id="selectColdDishes" resultMap="kitchenOrder">
+		SELECT * 
+		FROM colddish;
+	</select>
+
+	<select id="selectServedDishes" resultMap="kitchenOrder">
+		SELECT * 
+		FROM servedorder;
+	</select>
+</mapper>

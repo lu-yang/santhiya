@@ -61,7 +61,7 @@
 	
 	<select id="select" parameterType="Takeaway" resultMap="takeawayResult">
 		SELECT
-		tor.id as turnover_id, tor.checkout, tor.takeaway_id, tor.discount, tor.payment
+		tor.id as turnover_id, tor.checkout, tor.takeaway_id, tor.discount, tor.payment,
 		ta.created,ta.memo,ta.takeaway,ta.id, ta.vaild, ta.printed, ta.source, ta.delivery 
 		FROM
 		takeaway ta, turnover tor
