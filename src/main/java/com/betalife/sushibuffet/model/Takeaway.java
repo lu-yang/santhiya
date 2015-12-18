@@ -10,42 +10,52 @@ public class Takeaway extends BaseModel {
 	private Date created;
 	private Date updated;
 	private String memo;
-	private boolean takeaway;
-	private boolean vaild;
-	private boolean printed;
-	private int source;
-	private boolean delivery;
+	private Boolean takeaway;
+	private Boolean vaild;
+	private Boolean printed;
+	private Integer source;
+	private Boolean delivery;
 	private Turnover turnover;
+	// @JsonFormat(pattern = "yyyy/MM/dd hh:mm:ss")
+	private Date deliveryTimestamp;
 
-	public boolean isDelivery() {
+	public Date getDeliveryTimestamp() {
+		return deliveryTimestamp;
+	}
+
+	public void setDeliveryTimestamp(Date deliveryTimestamp) {
+		this.deliveryTimestamp = deliveryTimestamp;
+	}
+
+	public Boolean isDelivery() {
 		return delivery;
 	}
 
-	public void setDelivery(boolean delivery) {
+	public void setDelivery(Boolean delivery) {
 		this.delivery = delivery;
 	}
 
-	public boolean isVaild() {
+	public Boolean isVaild() {
 		return vaild;
 	}
 
-	public void setVaild(boolean vaild) {
+	public void setVaild(Boolean vaild) {
 		this.vaild = vaild;
 	}
 
-	public boolean isPrinted() {
+	public Boolean isPrinted() {
 		return printed;
 	}
 
-	public void setPrinted(boolean printed) {
+	public void setPrinted(Boolean printed) {
 		this.printed = printed;
 	}
 
-	public int getSource() {
+	public Integer getSource() {
 		return source;
 	}
 
-	public void setSource(int source) {
+	public void setSource(Integer source) {
 		this.source = source;
 	}
 
@@ -81,11 +91,11 @@ public class Takeaway extends BaseModel {
 		this.memo = memo;
 	}
 
-	public boolean isTakeaway() {
+	public Boolean isTakeaway() {
 		return takeaway;
 	}
 
-	public void setTakeaway(boolean takeaway) {
+	public void setTakeaway(Boolean takeaway) {
 		this.takeaway = takeaway;
 	}
 

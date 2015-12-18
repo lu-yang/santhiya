@@ -18,5 +18,5 @@ public interface TakeawayMapper {
 
 	List<TakeawayExt> selectAll(Map<String, Date> param);
 
-	TakeawayExt select(Takeaway t);
+	Takeaway select(Takeaway t);
 }

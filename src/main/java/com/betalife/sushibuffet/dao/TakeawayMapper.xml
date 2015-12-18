@@ -9,10 +9,12 @@
 		<result property="memo" column="memo" />
 		<result property="takeaway" column="takeaway" />
 		<result property="created" column="created" />
+		<result property="updated" column="updated" />
 		<result property="vaild" column="vaild" />
 		<result property="printed" column="printed" />
 		<result property="source" column="source" />
 		<result property="delivery" column="delivery" />
+		<result property="deliveryTimestamp" column="delivery_timestamp" />
 		<association property="turnover" javaType="Turnover">
 			<id property="id" column="turnover_id" />
 			<result property="checkout" column="checkout" />
@@ -28,19 +30,34 @@
 
 	<insert id="insert" parameterType="Takeaway" useGeneratedKeys="true"
 		keyProperty="id">
-		INSERT INTO takeaway (memo, takeaway, vaild, printed, source, delivery)
-		VALUES (#{memo}, #{takeaway}, #{vaild}, #{printed}, #{source}, #{delivery})
+		INSERT INTO takeaway (memo, takeaway, vaild, printed, source, delivery, delivery_timestamp)
+		VALUES (#{memo}, #{takeaway}, #{vaild}, #{printed}, #{source}, #{delivery}, #{deliveryTimestamp})
 	</insert>
 
 	<update id="update" parameterType="Takeaway">
 		UPDATE takeaway
 		SET
-		memo=#{memo},
-		takeaway=#{takeaway},
-		vaild=#{vaild},
-		printed=#{printed},
-		source=#{source},
-		delivery=#{delivery},
+		<if test="memo != null">
+			memo=#{memo},
+		</if>
+		<if test="takeaway != null">
+			takeaway=#{takeaway},
+		</if>
+		<if test="vaild != null">
+			vaild=#{vaild},
+		</if>
+		<if test="printed != null">
+			printed=#{printed},
+		</if>
+		<if test="source != null">
+			source=#{source},
+		</if>
+		<if test="delivery != null">
+			delivery=#{delivery},
+		</if>
+		<if test="deliveryTimestamp != null">
+			delivery_timestamp=#{deliveryTimestamp},
+		</if>
 		updated=now()
 		WHERE id=#{id}
 	</update>
@@ -48,21 +65,22 @@
 	<select id="selectAll" resultMap="takeawayExtResult">
 		SELECT 
 		  SUM(o.COUNT* p.product_price) AS total,
-		  tn.id AS turnover_id, tn.discount, tn.checkout, tn.payment, ta.memo, ta.takeaway, ta.created, ta.id, ta.vaild, ta.printed, ta.source, ta.delivery 
+		  tn.id AS turnover_id, tn.discount, tn.checkout, tn.payment, 
+		  ta.memo, ta.takeaway, ta.created, ta.id, ta.vaild, ta.printed, ta.source, ta.delivery, ta.delivery_timestamp, ta.updated 
 		FROM
-		  `order` o, product p,  turnover tn, takeaway ta  
+			turnover tn LEFT JOIN `order` o ON o.turnover_id = tn.id
+			   LEFT JOIN product p ON o.product_id = p.id,
+		    takeaway ta  
 		WHERE ta.created BETWEEN #{from} AND #{to}
 		  AND tn.takeaway_id = ta.id 
-		  AND o.turnover_id = tn.id 
-		  AND o.product_id = p.id 
 		GROUP BY ta.id 
-		ORDER BY ta.created DESC ;	    
+		ORDER BY ta.created DESC ;
 	</select>
 	
 	<select id="select" parameterType="Takeaway" resultMap="takeawayResult">
 		SELECT
 		tor.id as turnover_id, tor.checkout, tor.takeaway_id, tor.discount, tor.payment,
-		ta.created,ta.memo,ta.takeaway,ta.id, ta.vaild, ta.printed, ta.source, ta.delivery 
+		ta.created,ta.memo,ta.takeaway,ta.id, ta.vaild, ta.printed, ta.source, ta.delivery, ta.delivery_timestamp, ta.updated 
 		FROM
 		takeaway ta, turnover tor
 		WHERE ta.id=tor.takeaway_id

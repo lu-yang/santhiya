@@ -13,7 +13,7 @@ public class Order extends BaseModel {
 	private static final long serialVersionUID = 1L;
 	// private int turnoverId;
 	// private int productId;
-	private int count;
+	private Integer count;
 
 	private Product product;
 	private Turnover turnover;
@@ -23,8 +23,8 @@ public class Order extends BaseModel {
 	private Date created;
 	private Date updated;
 
-	private int modified;
-	private int status;
+	private Integer modified;
+	private Integer status;
 
 	private List<OrderAttribution> orderAttributions;
 
@@ -42,19 +42,19 @@ public class Order extends BaseModel {
 		return created;
 	}
 
-	public int getModified() {
+	public Integer getModified() {
 		return modified;
 	}
 
-	public void setModified(int modified) {
+	public void setModified(Integer modified) {
 		this.modified = modified;
 	}
 
-	public int getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
 
-	public void setStatus(int status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 
@@ -93,7 +93,7 @@ public class Order extends BaseModel {
 		this.locale = locale;
 	}
 
-	public int getCount() {
+	public Integer getCount() {
 		return count;
 	}
 
@@ -113,7 +113,7 @@ public class Order extends BaseModel {
 		this.turnover = turnover;
 	}
 
-	public void setCount(int count) {
+	public void setCount(Integer count) {
 		this.count = count;
 	}
 

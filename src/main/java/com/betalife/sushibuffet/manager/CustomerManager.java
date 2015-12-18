@@ -201,13 +201,16 @@ public class CustomerManager {
 				orderAttributionMapper.delete(params);
 
 				Order entity = orderMapper.select(o);
-				entity.setCount(entity.getCount() + o.getCount());
+				int count = entity.getCount() + o.getCount();
 				// 0:未修改数量；1：加菜；2：减菜；3：消菜
-				if (entity.getCount() == 0) {
+				if (count == 0) {
 					orderMapper.delete(entity);
 					o.setOrderAttributions(null);
 					o.setModified(3);
 				} else {
+					Order model = new Order();
+					model.setId(o.getId());
+					model.setCount(count);
 					orderMapper.update(entity);
 					o.setModified(o.getCount() > 0 ? 1 : 2);
 				}
@@ -438,7 +441,6 @@ public class CustomerManager {
 	public void reminderOrder(int id) {
 		Order o = new Order();
 		o.setId(id);
-		o = orderMapper.select(o);
 		o.setStatus(o.getStatus() + 1);
 		orderMapper.update(o);
 	}
@@ -447,7 +449,6 @@ public class CustomerManager {
 	public void serveOrder(int id, int status) {
 		Order o = new Order();
 		o.setId(id);
-		o = orderMapper.select(o);
 		o.setStatus(status);
 		orderMapper.update(o);
 	}

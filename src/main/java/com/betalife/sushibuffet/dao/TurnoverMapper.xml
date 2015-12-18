@@ -15,7 +15,19 @@
 	<update id="update" parameterType="Turnover">
 		UPDATE turnover
 		SET
-		table_id=#{tableId}, discount=#{discount}, checkout=#{checkout}, payment=#{payment},
+		<if test="tableId != null">
+			table_id=#{tableId}, 
+		</if>
+		<if test="discount != null">
+			discount=#{discount}, 
+		</if>
+		<if test="checkout != null">
+			checkout=#{checkout}, 
+		</if>
+		<if test="payment != null">
+			payment=#{payment},
+		</if>
+		
 		updated=now()
 		WHERE id=#{id}
 	</update>

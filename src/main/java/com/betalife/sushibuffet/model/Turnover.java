@@ -8,8 +8,8 @@ public class Turnover extends BaseModel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private int tableId;
-	private boolean checkout;
+	private Integer tableId;
+	private Boolean checkout;
 	private int firstTableId;
 	private Integer discount;
 	private Integer takeawayId;
@@ -50,19 +50,19 @@ public class Turnover extends BaseModel {
 		this.firstTableId = firstTableId;
 	}
 
-	public int getTableId() {
+	public Integer getTableId() {
 		return tableId;
 	}
 
-	public void setTableId(int tableId) {
+	public void setTableId(Integer tableId) {
 		this.tableId = tableId;
 	}
 
-	public boolean isCheckout() {
+	public Boolean isCheckout() {
 		return checkout;
 	}
 
-	public void setCheckout(boolean checkout) {
+	public void setCheckout(Boolean checkout) {
 		this.checkout = checkout;
 	}
 

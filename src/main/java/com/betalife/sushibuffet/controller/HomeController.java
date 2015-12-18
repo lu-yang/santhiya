@@ -182,18 +182,6 @@ public class HomeController {
 		return printOrders(locale, turnoverId, false);
 	}
 
-	// 打印所有turnoverId等于{turnoverId}的点单记录（结帐单）
-	// @RequestMapping(value =
-	// "orders/print/{locale}/{turnoverId}/{checkout}/{kitchen}", method =
-	// RequestMethod.GET, produces = "application/json")
-	// public @ResponseBody BooleanExchange printOrders(@PathVariable String
-	// locale,
-	// @PathVariable int turnoverId, @PathVariable boolean checkout,
-	// @PathVariable boolean kitchen)
-	// throws Exception {
-	// return printOrders(locale, turnoverId, false);
-	// }
-
 	// 更新turnover
 	@RequestMapping(value = "turnover", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
 	public @ResponseBody BooleanExchange updateTurnover(@RequestBody Turnover turnover) {
@@ -298,7 +286,8 @@ public class HomeController {
 		return exchange;
 	}
 
-	// 更新一个外卖，如果{checkout}是true，会更新{takeaway}所关联的{turnover}。通俗讲就是，{checkout}是true的时候，表示外卖结账，{takeaway}关联的{turnover}的{checkout}需要被更新成true
+	// 更新一个外卖，如果{checkout}是true，会更新{takeaway}所关联的{turnover}。
+	// {checkout}是true的时候，表示外卖结账，{takeaway}关联的{turnover}的{checkout}需要被更新成true
 	@RequestMapping(value = "takeaway/{checkout}", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
 	public @ResponseBody BooleanExchange updateTakeaway(@PathVariable boolean checkout,
 			@RequestBody Takeaway takeaway) {
