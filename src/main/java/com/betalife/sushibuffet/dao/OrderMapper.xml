@@ -68,10 +68,10 @@
 	<select id="selectOrdersByDate" parameterType="map" resultMap="orderResult">
 		SELECT o.id, o.`count`, o.turnover_id, o.product_id, o.updated, o.created, o.`status`, o.modified, o.served,
 			p.taxgroup_id, p.category_id, p.product_price, t.discount, t.checkout, t.takeaway_id, t.table_id, t.payment
-		FROM `order` o, turnover t, 	product p
+		FROM `order` o, turnover t, product p
 		WHERE o.turnover_id = t.id
 		AND o.product_id = p.id
-		AND o.created BETWEEN #{from} AND #{to}
+		AND t.created BETWEEN #{from} AND #{to}
 	</select>
 
 	<select id="selectOrders" resultMap="orderResult">

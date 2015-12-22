@@ -1,5 +1,6 @@
 package com.betalife.sushibuffet.controller;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -212,12 +213,16 @@ public class HomeController {
 	}
 
 	// GET turnovers by type with total price. type: 1. 所有 2. 堂吃. 3. 外卖
-	@RequestMapping(value = "turnover/all/totalPrice/{type}", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody ListExchange<Map<String, Object>> getTurnoversWithTotalPrice(
-			@PathVariable int type) {
-
+	@RequestMapping(value = "turnover/all/totalPrice/{type}/{from}/{to}", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody ListExchange<Map<String, Object>> getTurnoversWithTotalPrice(@PathVariable int type,
+			@PathVariable String from, @PathVariable String to) throws ParseException {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date fromDate = sdf.parse(from);
+		Date toDate = sdf.parse(to);
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("type", type);
+		params.put("from", fromDate);
+		params.put("to", toDate);
 		List<Map<String, Object>> list = customerManager.getTurnoverListWithTotalPrice(params);
 		ListExchange<Map<String, Object>> exchange = new ListExchange<Map<String, Object>>();
 		exchange.setModel(list);

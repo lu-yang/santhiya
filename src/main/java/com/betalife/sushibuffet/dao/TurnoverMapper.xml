@@ -44,7 +44,7 @@
 		SELECT
 		id, table_id, discount, checkout, takeaway_id, payment, first_table_id, created, updated
 		FROM turnover
-		WHERE 1=1  
+		WHERE created BETWEEN #{from} AND #{to}  
 		<if test="type == 3">
 			and (takeaway_id is not null and takeaway_id !=0)
 		</if>

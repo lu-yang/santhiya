@@ -194,6 +194,7 @@ public class CustomerManager {
 			if (o.getId() == 0) {
 				o.setCreated(now);
 				o.setTurnover(turnover);
+				o.setModified(0);
 				orderMapper.insert(o);
 			} else {
 				Map<String, Integer> params = new HashMap<String, Integer>();

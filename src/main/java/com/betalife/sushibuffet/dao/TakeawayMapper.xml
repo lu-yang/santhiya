@@ -71,7 +71,7 @@
 			turnover tn LEFT JOIN `order` o ON o.turnover_id = tn.id
 			   LEFT JOIN product p ON o.product_id = p.id,
 		    takeaway ta  
-		WHERE ta.created BETWEEN #{from} AND #{to}
+		WHERE tn.created BETWEEN #{from} AND #{to}
 		  AND tn.takeaway_id = ta.id 
 		GROUP BY ta.id 
 		ORDER BY ta.created DESC ;
