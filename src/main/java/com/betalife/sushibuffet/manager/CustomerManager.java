@@ -442,6 +442,7 @@ public class CustomerManager {
 	public void reminderOrder(int id) {
 		Order o = new Order();
 		o.setId(id);
+		o = orderMapper.select(o);
 		o.setStatus(o.getStatus() + 1);
 		orderMapper.update(o);
 	}
