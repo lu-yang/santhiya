@@ -115,7 +115,7 @@
 			, served = NOW()
 			</if>
 		</if>
-		<if test="printed != null">
+		<if test="count != null">
 		, count=#{count}
 		</if>
 		<if test="modified != null">
