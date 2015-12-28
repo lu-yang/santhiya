@@ -9,7 +9,7 @@ public class Turnover extends BaseModel {
 	 */
 	private static final long serialVersionUID = 1L;
 	private Integer tableId;
-	private Boolean checkout;
+	private Boolean checkout = false;
 	private int firstTableId;
 	private Integer discount;
 	private Integer takeawayId;
