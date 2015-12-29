@@ -203,7 +203,7 @@ public class CustomerManager {
 
 				Order entity = orderMapper.select(o);
 				int count = entity.getCount() + o.getCount();
-				// 0:未修改数量；1：加菜；2：减菜；3：消菜
+				// Modified: 0:未修改数量；1：加菜；2：减菜；3：消菜
 				if (count == 0) {
 					orderMapper.delete(entity);
 					o.setOrderAttributions(null);
@@ -212,7 +212,7 @@ public class CustomerManager {
 					Order model = new Order();
 					model.setId(o.getId());
 					model.setCount(count);
-					orderMapper.update(entity);
+					orderMapper.update(model);
 					o.setModified(o.getCount() > 0 ? 1 : 2);
 				}
 			}
