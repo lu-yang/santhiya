@@ -1,19 +1,19 @@
 <#-- header  with logo -->
 \u001b|1B
-\u001b|cABrusselsesteenweg 416, 3090 Overijse
-\u001b|cATEL: 02 / 657 77 79
-\u001b|cAwww.dodoro.be
+\u001b|cAAvenue Georges Henri 223, 1200 Woluwe-Saint-Lambert
+\u001b|cATEL: 02 / 772 20 98
+\u001b|cAwww.yamasushi.be
 
 <#if tableNo??>
-\u001b|bC\u001b|rATable No.: ${tableNo}\n
+\u001b|bC\u001b|rATable T-${tableNo}\n
 <#else>
-\u001b|bC\u001b|rATakeaway No.: ${takeawayNo}\n
-\u001b|bC\u001b|rAMemo: ${memo}\n
-</#if> 
+\u001b|bC\u001b|rAEmporter No.: ${takeawayNo}\n
+\u001b|bC\u001b|rARemarque: ${memo}\n
+</#if>
 \u001b|bC\u001b|rAOrder time: ${date}\n
 
 <#list list as one>
-\u001b|N${one['pnum']}. ${one['pname']} x ${one['count']}
+\u001b|N ${one['count']} X ${one['pname']} (${one['cname']}) \u001b|rA\u001b|uC${one['subtotal']} \u001b|N\n
 
 <#-- attribution  -->
 <#if one.attrList??>
@@ -24,14 +24,12 @@
 </#if>
 <#-- attribution  -->
 
-\u001b|N${one['cname']} \u001b|rA\u001b|uC${one['subtotal']} Eur\u001b|N\n
 </#list>
-\u001b|Nt.v.a / b.t.w / v.a.t\n
 \u001b|NTax: Net  \u001b|cAExcl \u001b|rATotal\n
-\u001b|N${food_tax}: ${food_tax_paid} Eur  \u001b|cA${food_paid} Eur  \u001b|rA${food_total_paid} Eur 
+\u001b|N${food_tax}: ${food_tax_paid} Eur  \u001b|cA${food_paid} Eur  \u001b|rA${food_total_paid} Eur
 \u001b|N${alcool_tax}: ${alcool_tax_paid} Eur  \u001b|cA${alcool_paid} Eur  \u001b|rA${alcool_total_paid} Eur
 
-\u001b|bC\u001b|cATotal : ${total} Eur\n\n
-\u001b|bC\u001b|cADiscount : ${discount}\n\n
-\u001b|bC\u001b|cADiscount Price : ${discountPrice} Eur\n\n
+\u001b|bC\u001b|cATotal : ${total} Eur\n
+\u001b|bC\u001b|cAMerci et a bientot
+
 <#-- footer -->
