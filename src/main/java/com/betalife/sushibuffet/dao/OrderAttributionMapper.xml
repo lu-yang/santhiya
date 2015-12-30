@@ -19,9 +19,9 @@
 	
 	<select id="select" parameterType="OrderAttribution" resultMap="orderAttributionResult">
 		SELECT
-			oa.id, oa.order_id, oa.count, oa.attribution_id,  a.attribution_price, m.NAME, oa.updated, oa.created
+			oa.id, oa.order_id, oa.count, oa.attribution_id,  a.attribution_price, oa.updated, oa.created
 		FROM
-			orderattribution oa, attribution a LEFT JOIN multilang m ON m.id = CONCAT('a', a.id) AND m.locale = #{locale}
+			orderattribution oa, attribution a 
 		WHERE 
 			oa.id = #{id} AND
 			oa.attribution_id = a.id
