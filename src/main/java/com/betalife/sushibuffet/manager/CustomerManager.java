@@ -196,16 +196,25 @@ public class CustomerManager {
 				o.setTurnover(turnover);
 				o.setModified(0);
 				orderMapper.insert(o);
-			} else {
-				Map<String, Integer> params = new HashMap<String, Integer>();
-				params.put("orderId", o.getId());
-				orderAttributionMapper.delete(params);
 
-				Order entity = orderMapper.select(o);
-				int count = entity.getCount() + o.getCount();
+				List<OrderAttribution> orderAttributions = o.getOrderAttributions();
+				if (CollectionUtils.isNotEmpty(orderAttributions)) {
+					for (OrderAttribution oa : orderAttributions) {
+						oa.setOrderId(o.getId());
+						oa.setCreated(now);
+						orderAttributionMapper.insert(oa);
+					}
+				}
+			} else {
+				// Map<String, Integer> params = new HashMap<String, Integer>();
+				// params.put("orderId", o.getId());
+				// orderAttributionMapper.delete(params);
+
+				Order orderCopy = orderMapper.select(o);
+				int count = orderCopy.getCount() + o.getCount();
 				// Modified: 0:未修改数量；1：加菜；2：减菜；3：消菜
 				if (count == 0) {
-					orderMapper.delete(entity);
+					orderMapper.delete(orderCopy);
 					o.setOrderAttributions(null);
 					o.setModified(3);
 				} else {
@@ -215,16 +224,26 @@ public class CustomerManager {
 					orderMapper.update(model);
 					o.setModified(o.getCount() > 0 ? 1 : 2);
 				}
-			}
 
-			List<OrderAttribution> orderAttributions = o.getOrderAttributions();
-			if (CollectionUtils.isNotEmpty(orderAttributions)) {
+				List<OrderAttribution> orderAttributions = o.getOrderAttributions();
+				Map<String, Integer> params = new HashMap<String, Integer>();
 				for (OrderAttribution oa : orderAttributions) {
-					oa.setOrderId(o.getId());
-					oa.setCreated(now);
-					orderAttributionMapper.insert(oa);
+					OrderAttribution orderAttributionCopy = orderAttributionMapper.select(oa);
+					int orderAttributionCount = orderAttributionCopy.getCount() + oa.getCount();
+					if (orderAttributionCount == 0) {
+						params.put("id", oa.getId());
+						orderAttributionMapper.delete(params);
+						oa.setModified(3);
+					} else {
+						OrderAttribution model = new OrderAttribution();
+						model.setId(o.getId());
+						model.setCount(count);
+						orderAttributionMapper.update(model);
+						oa.setModified(oa.getCount() > 0 ? 1 : 2);
+					}
 				}
 			}
+
 		}
 
 		if (isPrint) {
@@ -360,7 +379,6 @@ public class CustomerManager {
 		if (CollectionUtils.isEmpty(orders)) {
 			logger.info("there is no order to print." + model);
 		}
-		fillOrderAttribution(model.getLocale(), orders);
 
 		Turnover turnover = turnoverMapper.select(model.getTurnover());
 

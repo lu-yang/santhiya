@@ -15,6 +15,25 @@ public class OrderAttribution extends BaseModel {
 	private Date created;
 	private Date updated;
 
+	private Integer modified;
+	private Integer status;
+
+	public Integer getModified() {
+		return modified;
+	}
+
+	public void setModified(Integer modified) {
+		this.modified = modified;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
 	public int getCount() {
 		return count;
 	}

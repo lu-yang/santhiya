@@ -13,7 +13,11 @@ public interface OrderAttributionMapper {
 
 	void insert(OrderAttribution o);
 
+	void update(OrderAttribution o);
+
 	void delete(Map<String, Integer> params);
 
 	void deleteAll();
+
+	OrderAttribution select(OrderAttribution o);
 }
