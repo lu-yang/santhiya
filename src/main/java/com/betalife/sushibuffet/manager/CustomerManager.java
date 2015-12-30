@@ -226,22 +226,25 @@ public class CustomerManager {
 				}
 
 				List<OrderAttribution> orderAttributions = o.getOrderAttributions();
-				Map<String, Integer> params = new HashMap<String, Integer>();
-				for (OrderAttribution oa : orderAttributions) {
-					OrderAttribution orderAttributionCopy = orderAttributionMapper.select(oa);
-					int orderAttributionCount = orderAttributionCopy.getCount() + oa.getCount();
-					if (orderAttributionCount == 0) {
-						params.put("id", oa.getId());
-						orderAttributionMapper.delete(params);
-						oa.setModified(3);
-					} else {
-						OrderAttribution model = new OrderAttribution();
-						model.setId(o.getId());
-						model.setCount(count);
-						orderAttributionMapper.update(model);
-						oa.setModified(oa.getCount() > 0 ? 1 : 2);
+				if (CollectionUtils.isNotEmpty(orderAttributions)) {
+					Map<String, Integer> params = new HashMap<String, Integer>();
+					for (OrderAttribution oa : orderAttributions) {
+						OrderAttribution orderAttributionCopy = orderAttributionMapper.select(oa);
+						int orderAttributionCount = orderAttributionCopy.getCount() + oa.getCount();
+						if (orderAttributionCount == 0) {
+							params.put("id", oa.getId());
+							orderAttributionMapper.delete(params);
+							oa.setModified(3);
+						} else {
+							OrderAttribution model = new OrderAttribution();
+							model.setId(o.getId());
+							model.setCount(count);
+							orderAttributionMapper.update(model);
+							oa.setModified(oa.getCount() > 0 ? 1 : 2);
+						}
 					}
 				}
+
 			}
 
 		}
