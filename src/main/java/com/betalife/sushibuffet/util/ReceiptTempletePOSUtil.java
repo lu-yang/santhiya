@@ -19,6 +19,7 @@ import com.betalife.sushibuffet.model.Category;
 import com.betalife.sushibuffet.model.Order;
 import com.betalife.sushibuffet.model.OrderAttribution;
 import com.betalife.sushibuffet.model.Product;
+import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Taxgroups;
 import com.betalife.sushibuffet.model.Turnover;
 
@@ -30,7 +31,8 @@ public class ReceiptTempletePOSUtil extends TempletePOSUtil {
 		this.templateFile = templateFile;
 	}
 
-	public Map<String, Object> buildParam(Turnover turnover, List<Order> orders, String locale) {
+	public Map<String, Object> buildParam(Turnover turnover, List<Order> orders, String locale,
+			Takeaway takeaway) {
 
 		Map<Integer, Category> categoryMap = getCategoryMap(locale);
 		Map<Integer, Product> productMap = getProductMap(locale);
@@ -38,10 +40,11 @@ public class ReceiptTempletePOSUtil extends TempletePOSUtil {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("date", sdf.format(new Date()));
 
-		boolean takeaway = DodoroUtil.isTakeaway(turnover);
-		if (takeaway) {
+		boolean isTakeaway = DodoroUtil.isTakeaway(turnover);
+		if (isTakeaway) {
 			Integer takeawayId = turnover.getTakeawayId();
 			map.put("takeawayNo", takeawayId);
+			map.put("memo", takeaway.getMemo());
 		} else {
 			int tableId = orders.get(0).getTurnover().getTableId();
 			map.put("tableNo", tableId);
@@ -108,7 +111,7 @@ public class ReceiptTempletePOSUtil extends TempletePOSUtil {
 		Taxgroups foodTax = taxgroupsMap.get(FOOD);
 		Taxgroups alcoholTax = taxgroupsMap.get(ALCOHOL);
 
-		if (takeaway) {
+		if (isTakeaway) {
 			putTotal(foodTax.getTakeaway(), FOOD, getKindTotal(kindTotalMap, foodTax.getId() + ""), map);
 
 			putTotal(alcoholTax.getTakeaway(), ALCOHOL, getKindTotal(kindTotalMap, alcoholTax.getId() + ""),

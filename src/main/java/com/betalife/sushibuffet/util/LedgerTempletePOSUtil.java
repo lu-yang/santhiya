@@ -16,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import com.betalife.sushibuffet.model.Order;
 import com.betalife.sushibuffet.model.OrderAttribution;
 import com.betalife.sushibuffet.model.Product;
+import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Taxgroups;
 import com.betalife.sushibuffet.model.Turnover;
 
@@ -28,7 +29,8 @@ public class LedgerTempletePOSUtil extends TempletePOSUtil {
 		this.templateFile = templateFile;
 	}
 
-	public Map<String, Object> buildParam(Turnover nouse, List<Order> orders, String nouse2) {
+	public Map<String, Object> buildParam(Turnover nouse, List<Order> orders, String nouse2,
+			Takeaway nouse3) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("date", sdf.format(new Date()));
 

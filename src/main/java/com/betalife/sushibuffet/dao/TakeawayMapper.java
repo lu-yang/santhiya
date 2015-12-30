@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.betalife.sushibuffet.model.Takeaway;
-import com.betalife.sushibuffet.model.TakeawayExt;
 
 public interface TakeawayMapper {
 	void insert(Takeaway t);
@@ -16,7 +15,7 @@ public interface TakeawayMapper {
 
 	void deleteAll();
 
-	List<TakeawayExt> selectAll(Map<String, Date> param);
+	List<Takeaway> selectAll(Map<String, Date> param);
 
 	Takeaway select(Takeaway t);
 }

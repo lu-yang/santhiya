@@ -20,6 +20,7 @@ import com.betalife.sushibuffet.dao.ProductMapper;
 import com.betalife.sushibuffet.model.Category;
 import com.betalife.sushibuffet.model.Order;
 import com.betalife.sushibuffet.model.Product;
+import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Turnover;
 
 import freemarker.template.Template;
@@ -43,8 +44,8 @@ public abstract class TempleteUtil {
 
 	protected abstract void setTemplateFile(String templateFile);
 
-	public abstract Map<String, ?> buildParam(Turnover turnover, List<Order> orders, String locale)
-			throws Exception;
+	public abstract Map<String, ?> buildParam(Turnover turnover, List<Order> orders, String locale,
+			Takeaway takeaway) throws Exception;
 
 	protected File getFile() throws IOException {
 		File file;

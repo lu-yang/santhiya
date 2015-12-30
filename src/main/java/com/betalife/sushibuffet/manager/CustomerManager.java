@@ -31,10 +31,10 @@ import com.betalife.sushibuffet.model.Order;
 import com.betalife.sushibuffet.model.OrderAttribution;
 import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Takeaway;
-import com.betalife.sushibuffet.model.TakeawayExt;
 import com.betalife.sushibuffet.model.Turnover;
 import com.betalife.sushibuffet.print.PrintManager;
 import com.betalife.sushibuffet.util.Constant;
+import com.betalife.sushibuffet.util.DodoroUtil;
 import com.betalife.sushibuffet.util.LedgerTempletePOSUtil;
 
 @Service
@@ -110,7 +110,7 @@ public class CustomerManager {
 		Order order = new Order();
 		order.setTurnover(turnover);
 		List<Order> orders = getOrders(order);
-		Map<String, Object> map = ledgerTempletePOSUtil.buildParam(null, orders, null);
+		Map<String, Object> map = ledgerTempletePOSUtil.buildParam(null, orders, null, null);
 		map.put("turnover", turnover);
 		return map;
 	}
@@ -125,7 +125,7 @@ public class CustomerManager {
 			Order order = new Order();
 			order.setTurnover(turnover);
 			List<Order> orders = getOrders(order);
-			Map<String, Object> map = ledgerTempletePOSUtil.buildParam(null, orders, null);
+			Map<String, Object> map = ledgerTempletePOSUtil.buildParam(null, orders, null, null);
 			map.put("turnover", turnover);
 			result.add(map);
 		}
@@ -279,7 +279,7 @@ public class CustomerManager {
 		}
 		fillOrderAttribution(locale, orders);
 
-		Map<String, Object> map = ledgerTempletePOSUtil.buildParam(null, orders, null);
+		Map<String, Object> map = ledgerTempletePOSUtil.buildParam(null, orders, null, null);
 		printManager.printLedger(map);
 		return map;
 	}
@@ -332,11 +332,23 @@ public class CustomerManager {
 		takeaway.setTurnover(turnover);
 	}
 
-	public List<TakeawayExt> getTakeaways(Date from, Date to) {
+	public List<Map<String, Object>> getTakeaways(Date from, Date to) {
 		Map<String, Date> param = new HashMap<String, Date>();
 		param.put("from", from);
 		param.put("to", to);
-		return takeawayMapper.selectAll(param);
+		List<Takeaway> list = takeawayMapper.selectAll(param);
+
+		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+		for (Takeaway takeaway : list) {
+			Order order = new Order();
+			Turnover turnover = takeaway.getTurnover();
+			order.setTurnover(turnover);
+			List<Order> orders = getOrders(order);
+			Map<String, Object> map = ledgerTempletePOSUtil.buildParam(null, orders, null, null);
+			map.put("takeaway", takeaway);
+			result.add(map);
+		}
+		return result;
 	}
 
 	public Takeaway get(Takeaway t) {
@@ -389,8 +401,14 @@ public class CustomerManager {
 
 				}
 			}
-
-			printManager.printReceipt(turnover, new ArrayList<Order>(map.values()), model.getLocale(), true);
+			Takeaway takeaway = null;
+			if (DodoroUtil.isTakeaway(turnover)) {
+				takeaway = new Takeaway();
+				takeaway.setId(turnover.getTakeawayId());
+				takeaway = takeawayMapper.select(takeaway);
+			}
+			printManager.printReceipt(turnover, new ArrayList<Order>(map.values()), model.getLocale(), true,
+					takeaway);
 		}
 	}
 

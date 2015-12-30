@@ -30,7 +30,6 @@ import com.betalife.sushibuffet.exchange.MapExchange;
 import com.betalife.sushibuffet.exchange.OrderListExchange;
 import com.betalife.sushibuffet.exchange.ProductListExchange;
 import com.betalife.sushibuffet.exchange.TakeawayExchange;
-import com.betalife.sushibuffet.exchange.TakeawayListExchange;
 import com.betalife.sushibuffet.exchange.TurnoverExchange;
 import com.betalife.sushibuffet.manager.CustomerManager;
 import com.betalife.sushibuffet.model.Category;
@@ -38,7 +37,6 @@ import com.betalife.sushibuffet.model.Diningtable;
 import com.betalife.sushibuffet.model.Order;
 import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Takeaway;
-import com.betalife.sushibuffet.model.TakeawayExt;
 import com.betalife.sushibuffet.model.Turnover;
 import com.betalife.sushibuffet.util.Constant;
 
@@ -243,7 +241,7 @@ public class HomeController {
 
 	// 取所有外卖记录（当天的）
 	@RequestMapping(value = "takeaways", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody TakeawayListExchange takeaways() {
+	public @ResponseBody ListExchange<Map<String, Object>> takeaways() {
 		Date today = new Date();
 		today = DateUtils.setHours(today, 0);
 		today = DateUtils.setMinutes(today, 0);
@@ -251,23 +249,23 @@ public class HomeController {
 		today = DateUtils.setMilliseconds(today, 0);
 		Date tomorrow = DateUtils.addDays(today, 1);
 
-		List<TakeawayExt> all = customerManager.getTakeaways(today, tomorrow);
-		TakeawayListExchange exchange = new TakeawayListExchange();
-		exchange.setList(all.toArray(new TakeawayExt[0]));
+		List<Map<String, Object>> list = customerManager.getTakeaways(today, tomorrow);
+		ListExchange<Map<String, Object>> exchange = new ListExchange<Map<String, Object>>();
+		exchange.setModel(list);
 		return exchange;
 	}
 
 	// 取外卖记录（指定日期的）
 	@RequestMapping(value = "takeaways/{from}/{to}", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody TakeawayListExchange takeaways(@PathVariable String from, @PathVariable String to)
-			throws Exception {
+	public @ResponseBody ListExchange<Map<String, Object>> takeaways(@PathVariable String from,
+			@PathVariable String to) throws Exception {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date fromDate = sdf.parse(from);
 		Date toDate = sdf.parse(to);
 
-		List<TakeawayExt> all = customerManager.getTakeaways(fromDate, toDate);
-		TakeawayListExchange exchange = new TakeawayListExchange();
-		exchange.setList(all.toArray(new TakeawayExt[0]));
+		List<Map<String, Object>> list = customerManager.getTakeaways(fromDate, toDate);
+		ListExchange<Map<String, Object>> exchange = new ListExchange<Map<String, Object>>();
+		exchange.setModel(list);
 		return exchange;
 	}
 

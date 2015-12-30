@@ -64,20 +64,15 @@
 
 	<select id="selectAll" resultMap="takeawayExtResult">
 		SELECT 
-		  SUM(o.COUNT* p.product_price) AS total,
-		  tn.id AS turnover_id, tn.discount, tn.checkout, tn.payment, 
-		  ta.memo, ta.takeaway, ta.created, ta.id, ta.vaild, ta.printed, ta.source, ta.delivery, ta.delivery_timestamp, ta.updated 
+			tor.id as turnover_id, tor.checkout, tor.takeaway_id, tor.discount, tor.payment,
+			ta.created,ta.memo,ta.takeaway,ta.id, ta.vaild, ta.printed, ta.source, ta.delivery, ta.delivery_timestamp, ta.updated 
 		FROM
-			turnover tn LEFT JOIN `order` o ON o.turnover_id = tn.id
-			   LEFT JOIN product p ON o.product_id = p.id,
-		    takeaway ta  
-		WHERE tn.created BETWEEN #{from} AND #{to}
-		  AND tn.takeaway_id = ta.id 
-		GROUP BY ta.id 
-		ORDER BY ta.created DESC ;
+			takeaway ta, turnover tor
+		WHERE ta.id=tor.takeaway_id 
+		AND tor.created BETWEEN #{from} AND #{to}
 	</select>
 	
-	<select id="select" parameterType="Takeaway" resultMap="takeawayResult">
+	<select id="select" parameterType="Takeaway" resultType="Takeaway">
 		SELECT
 		tor.id as turnover_id, tor.checkout, tor.takeaway_id, tor.discount, tor.payment,
 		ta.created,ta.memo,ta.takeaway,ta.id, ta.vaild, ta.printed, ta.source, ta.delivery, ta.delivery_timestamp, ta.updated 

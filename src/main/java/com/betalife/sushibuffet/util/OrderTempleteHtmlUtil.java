@@ -22,6 +22,7 @@ import com.betalife.sushibuffet.model.Category;
 import com.betalife.sushibuffet.model.Order;
 import com.betalife.sushibuffet.model.OrderAttribution;
 import com.betalife.sushibuffet.model.Product;
+import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Turnover;
 
 import freemarker.template.Template;
@@ -55,8 +56,8 @@ public class OrderTempleteHtmlUtil extends TempleteUtil {
 		template.setEncoding("UTF-8");
 	}
 
-	public Map<String, byte[]> buildParam(Turnover turnover, List<Order> orders, String locale)
-			throws Exception {
+	public Map<String, byte[]> buildParam(Turnover turnover, List<Order> orders, String locale,
+			Takeaway nouse) throws Exception {
 		if (CollectionUtils.isEmpty(orders)) {
 			return null;
 		}

@@ -8,6 +8,7 @@
 \u001b|bC\u001b|rATable No.: ${tableNo}\n
 <#else>
 \u001b|bC\u001b|rATakeaway No.: ${takeawayNo}\n
+\u001b|bC\u001b|rAMemo: ${memo}\n
 </#if> 
 \u001b|bC\u001b|rAOrder time: ${date}\n
 
