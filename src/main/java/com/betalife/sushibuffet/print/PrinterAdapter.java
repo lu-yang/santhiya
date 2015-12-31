@@ -1,4 +1,4 @@
-package com.betalife.sushibuffet.util;
+package com.betalife.sushibuffet.print;
 
 import java.util.List;
 

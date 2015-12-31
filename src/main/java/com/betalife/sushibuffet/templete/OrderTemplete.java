@@ -1,17 +1,12 @@
-package com.betalife.sushibuffet.util;
+package com.betalife.sushibuffet.templete;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,13 +19,10 @@ import com.betalife.sushibuffet.model.OrderAttribution;
 import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Turnover;
-
-import freemarker.template.Template;
+import com.betalife.sushibuffet.util.DodoroUtil;
 
 @Component
-public class OrderTempleteHtmlUtil extends TempleteUtil {
-
-	private Html2ImageBytes html2ImageBytes = new Html2ImageBytes();
+public class OrderTemplete extends ContentTemplete {
 
 	public static void main(String[] args) throws IOException {
 
@@ -45,19 +37,18 @@ public class OrderTempleteHtmlUtil extends TempleteUtil {
 		orders.add(o);
 		orders.add(o);
 
-		OrderTempleteHtmlUtil name = new OrderTempleteHtmlUtil();
+		OrderTemplete name = new OrderTemplete();
 		name.init();
 	}
 
-	@PostConstruct
-	public void init() throws IOException {
-		File file = getFile();
-		template = new Template(null, new InputStreamReader(new FileInputStream(file), "UTF-8"), null);
-		template.setEncoding("UTF-8");
+	public Map<String, Object> buildParam(Turnover turnover, List<Order> orders, String locale,
+			Takeaway nouse) throws Exception {
+		return null;
 	}
 
-	public Map<String, byte[]> buildParam(Turnover turnover, List<Order> orders, String locale,
-			Takeaway nouse) throws Exception {
+	// <barname, paramMap>
+	public Map<String, Map<String, Object>> buildBarnameParam(Turnover turnover, List<Order> orders,
+			String locale, Takeaway nouse) throws Exception {
 		if (CollectionUtils.isEmpty(orders)) {
 			return null;
 		}
@@ -120,18 +111,16 @@ public class OrderTempleteHtmlUtil extends TempleteUtil {
 			list.add(one);
 		}
 
-		Map<String, byte[]> printerMap = new HashMap<String, byte[]>();
+		Map<String, Map<String, Object>> printerMap = new HashMap<String, Map<String, Object>>();
 		Set<String> keySet = barNameMap.keySet();
 		for (String barname : keySet) {
-			map.put("barname", barname);
-			map.put("list", barNameMap.get(barname));
+			HashMap<String, Object> param = new HashMap<String, Object>();
+			param.put("barname", barname);
+			param.put("list", barNameMap.get(barname));
+			param.putAll(map);
 
-			String html = format(map);
-			System.out.println("print order list:");
-			System.out.println(html);
-			html2ImageBytes.loadHtml(html);
-			byte[] bytes = html2ImageBytes.getBytes();
-			printerMap.put(barname, bytes);
+			// byte[] bytes = posTemplete.format(map);
+			printerMap.put(barname, param);
 		}
 
 		return printerMap;

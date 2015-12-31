@@ -1,4 +1,4 @@
-package com.betalife.sushibuffet.util;
+package com.betalife.sushibuffet.templete;
 
 import javax.swing.text.Document;
 import javax.swing.text.Element;

@@ -1,4 +1,4 @@
-package com.betalife.sushibuffet.util;
+package com.betalife.sushibuffet.templete;
 
 import static com.betalife.sushibuffet.util.DodoroUtil.TEN_THOUSAND;
 import static com.betalife.sushibuffet.util.DodoroUtil.ZERO;
@@ -22,9 +22,10 @@ import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Taxgroups;
 import com.betalife.sushibuffet.model.Turnover;
+import com.betalife.sushibuffet.util.DodoroUtil;
 
 @Component
-public class ReceiptTempletePOSUtil extends TempletePOSUtil {
+public class ReceiptTemplete extends ContentTemplete {
 	@Value("${receipt.template}")
 	@Override
 	protected void setTemplateFile(String templateFile) {

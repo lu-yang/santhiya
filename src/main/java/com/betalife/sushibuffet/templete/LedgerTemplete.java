@@ -1,4 +1,4 @@
-package com.betalife.sushibuffet.util;
+package com.betalife.sushibuffet.templete;
 
 import static com.betalife.sushibuffet.util.DodoroUtil.HUNDRED;
 import static com.betalife.sushibuffet.util.DodoroUtil.TEN_THOUSAND;
@@ -19,14 +19,21 @@ import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Taxgroups;
 import com.betalife.sushibuffet.model.Turnover;
+import com.betalife.sushibuffet.util.DodoroUtil;
 
 @Component
-public class LedgerTempletePOSUtil extends TempletePOSUtil {
+public class LedgerTemplete extends ContentTemplete {
 
 	@Value("${ledger.template}")
 	@Override
 	protected void setTemplateFile(String templateFile) {
 		this.templateFile = templateFile;
+	}
+
+	public Map<String, Map<String, Object>> buildBarnameParam(Map<String, Object> map) {
+		Map<String, Map<String, Object>> result = new HashMap<String, Map<String, Object>>();
+		result.put("default", map);
+		return result;
 	}
 
 	public Map<String, Object> buildParam(Turnover nouse, List<Order> orders, String nouse2,

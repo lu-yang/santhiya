@@ -1,4 +1,4 @@
-package com.betalife.sushibuffet.util;
+package com.betalife.sushibuffet.templete;
 
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
