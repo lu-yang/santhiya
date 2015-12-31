@@ -1,39 +1,46 @@
 <html>
 <style>
-body{font-family:Arial;font-size:13px;width:220px;}
-.rep{width:220px;word-wrap:break-word;padding:0 10px 0 0;}
+body{font-family:Georgia;font-size:12px;width:220px;}
+.rep{width:220px;word-wrap:break-word;padding:0 15px 0 0;}
+.font{font-size:15px; font-weight: bold;}
+.attrList{font-size: 11px;}
+.catName{font-size: 11px;}
+.count{font-size:18px; font-weight: bold;}
+.footer{font-size: 12px; }
 </style>
 <div class="rep">
-				<b>${barname}&nbsp;&nbsp;${date}</b><br><br>
+	<#if tableNo??>
+	<span class="font">T-${tableNo}</span>
+	<#else>
+	<span class="font">Emporter: ${takeawayNo}</span>
+	</#if>	<hr>
 
-
-			
 			<#list list as one>
+
 				<!-- 0:未修改数量；1：加菜；2：减菜；3：消菜 -->
 				<#if one.modified =1>
-				加菜
+				+)&nbsp;
 				<#elseif one.modified =2>
-				减菜
+				-)&nbsp;
 				<#elseif one.modified =3>
-				消菜
+				x)&nbsp;
 				</#if>
-				${one['count']} 份&nbsp;&nbsp;${one['cname']}&nbsp;&nbsp;${one['pname']}<br>
-				
+
+				<span class="count">${one['count']}</span> *&nbsp;&nbsp;${one['pname']}&nbsp;&nbsp;<span class="catName">(${one['cname']})</span><br>
 				<!-- attribution  -->
 				<#if one.attrList??>
+
 				<#list one.attrList as attr>
-					${attr.attrCount!""} 份&nbsp;&nbsp;${attr.attrName!""}<br>
-				</#list><br>
+				<li class="attrList"> &nbsp;&nbsp;${attr.attrName!""}</li>
+				</#list>
+
 				</#if>
 				<!-- attribution  -->
 			</#list><br>
-			<hr><br><br>
-				
-			<#if tableNo??>
-			台号:${tableNo}
-			<#else>
-			外卖号:${takeawayNo}
-			</#if> 
+			<hr>
+			<span class="footer">${barname}&nbsp;&nbsp;${date}</span><br><br>
+
+
 
 </div>
 </html>
