@@ -1,6 +1,5 @@
 package com.betalife.sushibuffet.templete;
 
-import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -18,31 +17,16 @@ public class Html2ImageBytes {
 	static final Dimension DEFAULT_SIZE = new Dimension(800, 800);
 
 	public Html2ImageBytes() {
-		editorPane = createJEditorPane();
-	}
-
-	public ComponentOrientation getOrientation() {
-		return editorPane.getComponentOrientation();
-	}
-
-	public void setOrientation(ComponentOrientation orientation) {
-		editorPane.setComponentOrientation(orientation);
-	}
-
-	public Dimension getSize() {
-		return editorPane.getSize();
-	}
-
-	public void setSize(Dimension dimension) {
-		editorPane.setSize(dimension);
+		editorPane = new JEditorPane();
+		editorPane.setSize(DEFAULT_SIZE);
+		editorPane.setEditable(false);
+		final SynchronousHTMLEditorKit kit = new SynchronousHTMLEditorKit();
+		editorPane.setEditorKitForContentType("text/html", kit);
+		editorPane.setContentType("text/html");
 	}
 
 	public void loadHtml(String html) {
 		editorPane.setText(html);
-	}
-
-	public Dimension getDefaultSize() {
-		return DEFAULT_SIZE;
 	}
 
 	public BufferedImage getBufferedImage() {
@@ -59,31 +43,21 @@ public class Html2ImageBytes {
 		BufferedImage bufferedImage = getBufferedImage();
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ImageIO.write(bufferedImage, "BMP", baos);
+		ImageIO.write(bufferedImage, "JPEG", baos);
 		baos.flush();
 		byte[] bytes = baos.toByteArray();
 		baos.close();
 		return bytes;
 	}
 
-	protected JEditorPane createJEditorPane() {
-		final JEditorPane editorPane = new JEditorPane();
-		editorPane.setSize(getDefaultSize());
-		editorPane.setEditable(false);
-		final SynchronousHTMLEditorKit kit = new SynchronousHTMLEditorKit();
-		editorPane.setEditorKitForContentType("text/html", kit);
-		editorPane.setContentType("text/html");
-		return editorPane;
-	}
-
 	public static void main(String[] args) throws IOException {
-		String bmpFile = "c:\\Users\\mbp-bobhao\\Desktop\\java\\test.bmp";
+		String bmpFile = "c:\\Users\\mbp-bobhao\\Desktop\\java\\test.jpeg";
 		String htmlFile = "c:\\Users\\mbp-bobhao\\Desktop\\java\\OrderTemplate.html";
 		Html2ImageBytes ut = new Html2ImageBytes();
 		String html = FileUtils.readFileToString(new File(htmlFile), "utf-8");
 		ut.loadHtml(html);
 
 		BufferedImage bufferedImage = ut.getBufferedImage();
-		ImageIO.write(bufferedImage, "BMP", new File(bmpFile));
+		ImageIO.write(bufferedImage, "JPEG", new File(bmpFile));
 	}
 }
