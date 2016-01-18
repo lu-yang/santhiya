@@ -26,9 +26,19 @@ public class Order extends BaseModel {
 	private Integer modified;
 	private Integer status;
 
+	private Boolean printed = false;
+
 	private List<OrderAttribution> orderAttributions;
 
 	private Date served;
+
+	public Boolean getPrinted() {
+		return printed;
+	}
+
+	public void setPrinted(Boolean printed) {
+		this.printed = printed;
+	}
 
 	public Date getServed() {
 		return served;
@@ -127,6 +137,7 @@ public class Order extends BaseModel {
 		copy.updated = updated;
 		copy.modified = modified;
 		copy.status = status;
+		copy.printed = printed;
 		if (CollectionUtils.isNotEmpty(orderAttributions)) {
 			for (OrderAttribution one : orderAttributions) {
 				copy.addOrderAttribution(one.copy());

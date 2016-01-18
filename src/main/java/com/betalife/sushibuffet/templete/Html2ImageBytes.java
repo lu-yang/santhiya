@@ -14,7 +14,7 @@ import org.apache.commons.io.FileUtils;
 
 public class Html2ImageBytes {
 	private JEditorPane editorPane;
-	static final Dimension DEFAULT_SIZE = new Dimension(800, 800);
+	static final Dimension DEFAULT_SIZE = new Dimension(2000, 1800);
 
 	public Html2ImageBytes() {
 		editorPane = new JEditorPane();
@@ -31,7 +31,7 @@ public class Html2ImageBytes {
 
 	public BufferedImage getBufferedImage() {
 		Dimension prefSize = editorPane.getPreferredSize();
-		BufferedImage img = new BufferedImage(250, editorPane.getPreferredSize().height,
+		BufferedImage img = new BufferedImage(1928, editorPane.getPreferredSize().height,
 				BufferedImage.TYPE_INT_RGB);
 		Graphics graphics = img.getGraphics();
 		editorPane.setSize(prefSize);

@@ -192,6 +192,7 @@ public class CustomerManager {
 		Date now = new Date();
 		for (Order o : orders) {
 			if (o.getId() == 0) {
+				o.setPrinted(isPrint);
 				o.setCreated(now);
 				o.setTurnover(turnover);
 				o.setModified(0);
@@ -221,6 +222,7 @@ public class CustomerManager {
 					Order model = new Order();
 					model.setId(o.getId());
 					model.setCount(count);
+					model.setPrinted(isPrint);
 					orderMapper.update(model);
 					o.setModified(o.getCount() > 0 ? 1 : 2);
 				}
@@ -378,60 +380,61 @@ public class CustomerManager {
 		return takeawayMapper.select(t);
 	}
 
-	public void printOrders(Order model, boolean kitchen) throws Exception {
-		List<Order> orders = getOrders(model);
-		if (CollectionUtils.isEmpty(orders)) {
-			logger.info("there is no order to print." + model);
+	public void printKitchenOrders(List<Order> orders, Turnover turnover) throws Exception {
+		List<Order> list = new ArrayList<Order>();
+		for (Order order : orders) {
+			if (!order.getPrinted()) {
+				list.add(order);
+			}
 		}
+		if (CollectionUtils.isNotEmpty(list)) {
+			orderMapper.updatePrint(list);
+		}
+		printManager.printOrders(turnover, orders, locale, false);
+	}
 
-		Turnover turnover = turnoverMapper.select(model.getTurnover());
-
-		if (kitchen) {
-			printManager.printOrders(turnover, orders, locale, false);
-		} else {
-			// productId
-			Map<Integer, Order> map = new HashMap<Integer, Order>();
-			// productId-attId
-			Map<String, OrderAttribution> attMap = new HashMap<String, OrderAttribution>();
-			for (Order order : orders) {
-				int id = order.getProduct().getId();
-				if (map.containsKey(id)) {
-					Order one = map.get(id);
-					one.setCount(one.getCount() + order.getCount());
-					List<OrderAttribution> orderAttributions = order.getOrderAttributions();
-					if (CollectionUtils.isNotEmpty(orderAttributions)) {
-						for (OrderAttribution orderAttribution : orderAttributions) {
-							String key = id + "-" + orderAttribution.getId();
-							if (attMap.containsKey(key)) {
-								OrderAttribution value = attMap.get(key);
-								value.setCount(value.getCount() + orderAttribution.getCount());
-							} else {
-								one.addOrderAttribution(orderAttribution);
-								attMap.put(key, orderAttribution);
-							}
+	public void printOrders(List<Order> orders, Turnover turnover, String locale) throws Exception {
+		// productId
+		Map<Integer, Order> map = new HashMap<Integer, Order>();
+		// productId-attId
+		Map<String, OrderAttribution> attMap = new HashMap<String, OrderAttribution>();
+		for (Order order : orders) {
+			int id = order.getProduct().getId();
+			if (map.containsKey(id)) {
+				Order one = map.get(id);
+				one.setCount(one.getCount() + order.getCount());
+				List<OrderAttribution> orderAttributions = order.getOrderAttributions();
+				if (CollectionUtils.isNotEmpty(orderAttributions)) {
+					for (OrderAttribution orderAttribution : orderAttributions) {
+						String key = id + "-" + orderAttribution.getId();
+						if (attMap.containsKey(key)) {
+							OrderAttribution value = attMap.get(key);
+							value.setCount(value.getCount() + orderAttribution.getCount());
+						} else {
+							one.addOrderAttribution(orderAttribution);
+							attMap.put(key, orderAttribution);
 						}
 					}
-				} else {
-					Order one = order.copy();
-					map.put(id, one);
-					List<OrderAttribution> orderAttributions = one.getOrderAttributions();
-					if (CollectionUtils.isNotEmpty(orderAttributions)) {
-						for (OrderAttribution orderAttribution : orderAttributions) {
-							attMap.put(id + "-" + orderAttribution.getId(), orderAttribution);
-						}
-					}
-
 				}
+			} else {
+				Order one = order.copy();
+				map.put(id, one);
+				List<OrderAttribution> orderAttributions = one.getOrderAttributions();
+				if (CollectionUtils.isNotEmpty(orderAttributions)) {
+					for (OrderAttribution orderAttribution : orderAttributions) {
+						attMap.put(id + "-" + orderAttribution.getId(), orderAttribution);
+					}
+				}
+
 			}
-			Takeaway takeaway = null;
-			if (DodoroUtil.isTakeaway(turnover)) {
-				takeaway = new Takeaway();
-				takeaway.setId(turnover.getTakeawayId());
-				takeaway = takeawayMapper.select(takeaway);
-			}
-			printManager.printReceipt(turnover, new ArrayList<Order>(map.values()), model.getLocale(), true,
-					takeaway);
 		}
+		Takeaway takeaway = null;
+		if (DodoroUtil.isTakeaway(turnover)) {
+			takeaway = new Takeaway();
+			takeaway.setId(turnover.getTakeawayId());
+			takeaway = takeawayMapper.select(takeaway);
+		}
+		printManager.printReceipt(turnover, new ArrayList<Order>(map.values()), locale, true, takeaway);
 	}
 
 	public List<Order> selectOrders(List<Order> orders) {

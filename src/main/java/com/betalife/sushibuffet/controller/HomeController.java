@@ -2,11 +2,13 @@ package com.betalife.sushibuffet.controller;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,15 +143,6 @@ public class HomeController {
 		return exchange;
 	}
 
-	// 这个暂时不用
-	@RequestMapping(value = "nouse", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
-	public @ResponseBody OrderListExchange updateOrder(@RequestBody List<Order> orders) {
-		List<Order> all = customerManager.selectOrders(orders);
-		OrderListExchange exchange = new OrderListExchange();
-		exchange.setList(all.toArray(new Order[0]));
-		return exchange;
-	}
-
 	private Order buildOrder(String locale, int turnoverId) {
 		Order model = new Order();
 		model.setLocale(locale);
@@ -161,7 +154,16 @@ public class HomeController {
 
 	private BooleanExchange printOrders(String locale, int turnoverId, boolean kitchen) throws Exception {
 		Order model = buildOrder(locale, turnoverId);
-		customerManager.printOrders(model, kitchen);
+		List<Order> orders = customerManager.getOrders(model);
+		if (CollectionUtils.isEmpty(orders)) {
+			logger.info("there is no order to print." + model);
+		}
+		Turnover turnover = customerManager.get(model.getTurnover());
+		if (kitchen) {
+			customerManager.printKitchenOrders(orders, turnover);
+		} else {
+			customerManager.printOrders(orders, turnover, locale);
+		}
 		BooleanExchange exchange = new BooleanExchange();
 		exchange.setModel(true);
 		return exchange;
@@ -179,6 +181,34 @@ public class HomeController {
 	public @ResponseBody BooleanExchange printOrders(@PathVariable String locale,
 			@PathVariable int turnoverId) throws Exception {
 		return printOrders(locale, turnoverId, false);
+	}
+
+	// 打印所有{orderId}的点单记录（厨房）
+	@RequestMapping(value = "printKitchenOrders", method = RequestMethod.POST, produces = "application/json")
+	public @ResponseBody BooleanExchange printKitchenOrders(@RequestBody List<Order> orders)
+			throws Exception {
+		orders = customerManager.selectOrders(orders);
+		Map<Integer, Turnover> tmap = new HashMap<Integer, Turnover>();
+		Map<Integer, List<Order>> omap = new HashMap<Integer, List<Order>>();
+		for (Order order : orders) {
+			Turnover turnover = order.getTurnover();
+			Integer id = turnover.getId();
+			if (!tmap.containsKey(id)) {
+				turnover = customerManager.get(turnover);
+				tmap.put(id, turnover);
+				omap.put(id, new ArrayList<Order>());
+			}
+			List<Order> list = omap.get(id);
+			list.add(order);
+		}
+		for (Integer id : tmap.keySet()) {
+			Turnover turnover = tmap.get(id);
+			List<Order> list = omap.get(id);
+			customerManager.printKitchenOrders(list, turnover);
+		}
+		BooleanExchange exchange = new BooleanExchange();
+		exchange.setModel(true);
+		return exchange;
 	}
 
 	// 更新turnover
