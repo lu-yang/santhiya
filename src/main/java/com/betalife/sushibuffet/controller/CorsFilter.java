@@ -15,8 +15,14 @@ public class CorsFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 			FilterChain filterChain) throws ServletException, IOException {
 		response.addHeader("Access-Control-Allow-Origin", "*");
-		response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-		response.addHeader("Access-Control-Allow-Headers", "X-Requested-With,Origin,Content-Type, Accept, Authorization");
+		 if (request.getHeader("Access-Control-Request-Method") != null
+                 && "OPTIONS".equals(request.getMethod())) {
+             // CORS "pre-flight" request
+             response.addHeader("Access-Control-Allow-Methods",
+                     "GET, POST, PUT, DELETE");
+             response.addHeader("Access-Control-Allow-Headers",
+                     "Authorization, X-Requested-With, Content-Type, Accept, Origin");
+         }
 		response.setHeader("Access-Control-Max-Age", "3600");
 		filterChain.doFilter(request, response);
 	}
