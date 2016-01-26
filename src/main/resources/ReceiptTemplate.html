@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html charset="utf-8">
+<style>
+body{font-family:"Times new roman";margin:0;padding:0;width:1480px; font-size:80pt; }
+.rep{word-wrap:break-all;padding:0 0 0 0;}
+.fontType{font-family: Georgia; font-weight: bold;}
+.font{font-size:120pt;  font-weight: bold;}
+.font-lg{font-size: 140pt;}
+.font-md{font-size:110pt; }
+.font-sm{font-size: 90pt;}
+.text-right{text-align: right;}
+.attrList{font-size:15pt;}
+.catName{font-size: 90pt;}
+.count{font-size:140pt; font-weight: bold;}
+.top{font-size:200pt;margin-left:60px;font-family:KaiTi;font-weight:bold;}
+.table{width:95%;}
+.totalPrice{text-align: right;font-size: 130px;font-weight: bold;}
+</style>
+<div class="top" >
+<p style="text-align:center;">山寿司</p>
+</div>
+<div class="rep">
+	<#if tableNo??>
+	<p class="font" style="margin-left:60px; text-decoration:underliner;">Table: T-${tableNo}</p>
+	<#else>
+	<p class="font" style="margin-left:60px; text-decoration:underliner;">Emporter</p>
+	<p class="font text-right">${memo}</p>
+	</#if>
+	<br>
+	<hr>
+<table width="100%" class="font-md" >
+	<tr class="font-sm">
+		<th>Num</th>
+		<th>Contenus</th>
+		<th>Total</th>
+	</tr>
+			<#list list as one>
+			<tr class="container">
+				<td ><span class="count">${one['count']}</span> *</td>
+				<td>${one['pname']} <span class="catName">(${one['cname']})</span></td>
+				<td>${one['subtotal']}</td>
+			</tr>
+			</#list>
+		</table>
+			<hr>
+						<p  class="totalPrice">Total : ${total} €</p><br>
+			<table with="60%" >
+				<tr>
+					<td>TVA:</td>
+					<td>Net</td>
+					<td>Excl</td>
+					<td>Total</td>
+				</tr>
+				<tr>
+					<td>${food_tax}:</td>
+					<td>${food_tax_paid}</td>
+					<td>${food_paid}</td>
+					<td>${food_total_paid}€</td>
+				</tr>
+				<tr>
+					<td>${alcool_tax}:</td>
+					<td>${alcool_tax_paid}</td>
+					<td>${alcool_paid}</td>
+					<td>${alcool_total_paid}€</td>
+				</tr>
+			</table>
+
+			<p style="text-align:center;">Merci et à bientôt</p><br>
+
+
+
+</div>
+</html>

@@ -6,6 +6,11 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
+import jpos.JposException;
+import jpos.POSPrinter;
+import jpos.POSPrinterConst;
+import jpos.POSPrinterControl113;
+
 public class EpsonPrinter implements Printer {
 
 	POSPrinterControl113 ptr = (POSPrinterControl113) new POSPrinter();
