@@ -34,6 +34,4 @@
 		<property name="basePackage" value="com.betalife.sushibuffet.dao" />
 	</bean>
 	
-	<!-- registered corsFilter -->
-	<bean id="corsFilter" class="com.betalife.sushibuffet.controller.CorsFilter" />
 </beans>
