@@ -2,3 +2,6 @@ target
 .settings
 gen
 .DS_Store
+.project
+.classpath
+
