@@ -308,6 +308,14 @@ public class HomeController {
 		return exchange;
 	}
 
+	@RequestMapping(value = "takeaway/convert/", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
+	public @ResponseBody TakeawayExchange convertTakeaway(@RequestBody Takeaway takeaway) {
+		customerManager.convert(takeaway);
+		TakeawayExchange exchange = new TakeawayExchange();
+		exchange.setModel(takeaway);
+		return exchange;
+	}
+
 	// 删除一个外卖
 	@RequestMapping(value = "takeaway/{takeawayId}", method = RequestMethod.DELETE, produces = "application/json")
 	public @ResponseBody BooleanExchange removeTakeaway(@PathVariable int takeawayId) {
@@ -420,4 +428,5 @@ public class HomeController {
 		exchange.setException(ex);
 		return exchange;
 	}
+
 }

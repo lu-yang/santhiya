@@ -357,6 +357,18 @@ public class CustomerManager {
 		takeaway.setTurnover(turnover);
 	}
 
+	@Transactional(rollbackFor = Exception.class)
+	public void convert(Takeaway takeaway) {
+		takeawayMapper.insert(takeaway);
+
+		Turnover turnover = takeaway.getTurnover();
+		turnover.setTakeawayId(takeaway.getId());
+		turnover.setTableId(0);
+		turnover.setFirstTableId(0);
+		turnoverMapper.update(turnover);
+
+	}
+
 	public List<Map<String, Object>> getTakeaways(Date from, Date to) {
 		Map<String, Date> param = new HashMap<String, Date>();
 		param.put("from", from);
