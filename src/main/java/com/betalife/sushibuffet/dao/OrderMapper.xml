@@ -12,6 +12,7 @@
 		<result property="served" column="served" />
 		<result property="status" column="status" />
 		<result property="modified" column="modified" />
+		<result property="printed" column="printed" />
 		<association property="turnover" javaType="Turnover">
 			<id property="id" column="turnover_id" />
 			<result property="checkout" column="checkout" />
@@ -29,6 +30,7 @@
 			<result property="num" column="num" />
 			<result property="productNum" column="product_num" />
 			<result property="taxgroupId" column="taxgroup_id" />
+			<result property="barName" column="bar_name" />
 		</association>
 	</resultMap>
 
@@ -40,8 +42,8 @@
 	</resultMap>
 
 	<select id="selectExtOrdersByTurnover" parameterType="Order" resultMap="orderExtResult">
-		SELECT o.id,o.`count`,o.turnover_id,o.product_id,t.checkout,o.updated,o.created,o.`status`, o.modified, o.served,
-			t.discount, t.payment, t.table_id, p.category_id, p.product_num, p.taxgroup_id,p.num,p.product_price,p.thumb,
+		SELECT o.id,o.`count`,o.turnover_id,o.product_id,t.checkout,o.updated,o.created,o.`status`, o.modified, o.served, o.printed,
+			t.discount, t.payment, t.table_id, p.category_id, p.product_num, p.taxgroup_id,p.num,p.product_price,p.thumb, p.bar_name,
 			m.NAME, m2.NAME category_name 
 		FROM `order` o, turnover t, 
 			product p LEFT JOIN multilang m ON m.id = CONCAT('p', p.id) AND m.locale = #{locale},
@@ -55,9 +57,10 @@
 	</select>
 
 	<select id="selectOrdersByTurnover" parameterType="Order" resultMap="orderResult">
-		SELECT o.id, o.`count`, o.turnover_id, o.product_id, t.checkout, o.updated, o.created, o.`status`, o.modified, o.served,
-			p.product_num, p.taxgroup_id, t.table_id, p.category_id, p.num, p.product_price, p.thumb, m.NAME, t.discount, t.payment
-		FROM `order` o,	turnover t, product p LEFT JOIN multilang m ON m.id = CONCAT('p', p.id) 	AND m.locale = #{locale}
+		SELECT o.id, o.`count`, o.turnover_id, o.product_id, t.checkout, o.updated, o.created, o.`status`, o.modified, o.served, o.printed,
+			p.product_num, p.taxgroup_id, t.table_id, p.category_id, p.num, p.product_price, p.thumb, p.bar_name,
+			m.NAME, t.discount, t.payment
+		FROM `order` o,	turnover t, product p LEFT JOIN multilang m ON m.id = CONCAT('p', p.id) AND m.locale = #{locale}
 		WHERE o.turnover_id = #{turnover.id}
 		AND o.turnover_id = t.id
 		AND o.product_id = p.id
@@ -75,8 +78,8 @@
 	</select>
 
 	<select id="selectOrders" resultMap="orderResult">
-		SELECT o.id, o.`count`, o.turnover_id, o.product_id, o.updated, o.created, o.`status`, o.modified, o.served, 
-			t.table_id, t.payment, p.category_id, p.num, p.product_price, p.thumb, m.NAME
+		SELECT o.id, o.`count`, o.turnover_id, o.product_id, o.updated, o.created, o.`status`, o.modified, o.served, o.printed, 
+			t.table_id, t.payment, p.category_id, p.num, p.product_price, p.thumb, p.bar_name, m.NAME
 		FROM `order` o, turnover t, product p LEFT JOIN multilang m ON m.id = CONCAT('p', p.id) AND m.locale = #{locale}
 		WHERE o.id in
 		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
@@ -92,7 +95,7 @@
 	
 	<select id="select" parameterType="Order" resultType="Order">
 		SELECT
-		id, turnover_id, product_id, `count`, created, updated, `status`, modified, served
+		id, turnover_id, product_id, `count`, created, updated, `status`, modified, served, printed
 		FROM `order`
 		WHERE id=#{id}
 	</select>
@@ -100,9 +103,9 @@
 	<insert id="insert" parameterType="Order" useGeneratedKeys="true"
 		keyProperty="id">
 		INSERT INTO `order`
-		(turnover_id, product_id, `count`, created)
+		(turnover_id, product_id, `count`, created, printed)
 		VALUES
-		(#{turnover.id}, #{product.id}, #{count}, #{created})
+		(#{turnover.id}, #{product.id}, #{count}, #{created}, #{printed})
 	</insert>
 
 	<update id="update" parameterType="Order">
@@ -121,9 +124,25 @@
 		<if test="modified != null">
 		, modified=#{modified}
 		</if>
+		<if test="printed != null">
+		, printed=#{printed}
+		</if>
 		WHERE id=#{id}
 	</update>
-
+	
+	<update id="updatePrint">
+		UPDATE `order`
+		SET 
+		updated=NOW() 
+		, printed= 1
+		WHERE id in
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+		    <!-- http://my.oschina.net/linuxred/blog/38802 
+		    http://blog.csdn.net/small____fish/article/details/8029030/ foreach 说明 -->
+			#{item.id}
+		</foreach>
+	</update>
+	
 	<delete id="deleteByTurnoverId" parameterType="Order">
 		DELETE FROM `order`
 		WHERE turnover_id=#{turnover.id}

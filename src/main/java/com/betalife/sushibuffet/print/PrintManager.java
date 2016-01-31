@@ -51,6 +51,9 @@ public class PrintManager implements ApplicationContextAware {
 	synchronized private void print(String barName, Object content, boolean logo, int times)
 			throws Exception {
 		Printer printer = getPrinter(barName);
+		if (printer == null) {
+			return;
+		}
 		List<Object> list = new ArrayList<Object>();
 		list.add(content);
 		list.add(printer.getCutPaper());
@@ -58,9 +61,17 @@ public class PrintManager implements ApplicationContextAware {
 	}
 
 	private Printer getPrinter(String barName) {
+		String key = "printer." + barName;
+		String logicName = null;
+		if (printers.containsKey(key)) {
+			logicName = printers.getProperty(key);
+			if (StringUtils.isEmpty(logicName)) {
+				return null;
+			}
+		} else {
+			logicName = printers.getProperty("printer.default");
+		}
 		Printer printer = applicationContext.getBean("printer", Printer.class);
-		String logicName = printers.getProperty("printer." + barName);
-		logicName = StringUtils.isEmpty(logicName) ? printers.getProperty("printer.default") : logicName;
 
 		printer.setLogicName(logicName);
 		return printer;

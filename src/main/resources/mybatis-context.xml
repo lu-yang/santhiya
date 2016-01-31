@@ -33,5 +33,5 @@
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<property name="basePackage" value="com.betalife.sushibuffet.dao" />
 	</bean>
-
+	
 </beans>

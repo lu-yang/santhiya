@@ -11,6 +11,16 @@
 	</listener>
 
 	<!-- Spring application context -->
+	<filter>
+		<filter-name>corsFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>corsFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
@@ -46,17 +56,6 @@
 		<filter-name>encoding-filter</filter-name>
 		<url-pattern>/</url-pattern>
 	</filter-mapping>
-
-	<filter>
-		<filter-name>corsFilter</filter-name>
-		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-	</filter>
-
-	<filter-mapping>
-		<filter-name>corsFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
 
 	<filter>
 		<filter-name>commonsRequestLoggingFilter</filter-name>

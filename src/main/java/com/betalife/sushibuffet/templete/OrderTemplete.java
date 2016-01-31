@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -72,13 +73,11 @@ public class OrderTemplete extends ContentTemplete {
 
 		for (Order order : orders) {
 			Product product = order.getProduct();
-			Category category = categoryMap.get(product.getCategoryId());
-			if (category == null) {
-				logger.error("没有CategoryId是" + product.getCategoryId() + "的Category");
-				break;
+			// String barName = category.getBarName();
+			String barName = product.getBarName();
+			if (StringUtils.isEmpty(barName)) {
+				barName = "empty";
 			}
-			String cateName = category.getName();
-			String barName = category.getBarName();
 			List<Map<String, Object>> list = null;
 			if (barNameMap.containsKey(barName)) {
 				list = barNameMap.get(barName);
@@ -87,6 +86,12 @@ public class OrderTemplete extends ContentTemplete {
 				barNameMap.put(barName, list);
 			}
 
+			Category category = categoryMap.get(product.getCategoryId());
+			if (category == null) {
+				logger.error("没有CategoryId是" + product.getCategoryId() + "的Category");
+				break;
+			}
+			String cateName = category.getName();
 			Map<String, Object> one = new HashMap<String, Object>();
 			one.put("pname", productMap.get(product.getId()).getProductName());
 			one.put("count", order.getCount() > 0 ? order.getCount() : -order.getCount());

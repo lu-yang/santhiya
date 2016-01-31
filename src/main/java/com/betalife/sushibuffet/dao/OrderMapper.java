@@ -27,4 +27,6 @@ public interface OrderMapper {
 	void deleteAll();
 
 	void update(Order o);
+
+	void updatePrint(List<Order> orders);
 }
