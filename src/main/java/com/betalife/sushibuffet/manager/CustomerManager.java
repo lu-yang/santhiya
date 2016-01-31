@@ -298,9 +298,7 @@ public class CustomerManager {
 		param.put("from", from);
 		param.put("to", to);
 		List<Order> orders = orderMapper.selectOrdersByDate(param);
-		if (CollectionUtils.isEmpty(orders)) {
-			return null;
-		}
+
 		fillOrderAttribution(locale, orders);
 
 		Map<String, Object> map = ledgerTemplete.buildParam(null, orders, null, null);

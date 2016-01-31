@@ -43,40 +43,41 @@ public class LedgerTemplete extends ContentTemplete {
 
 		int total = 0;
 		Map<String, Integer> kindTotalMap = new HashMap<String, Integer>();
-		for (Order order : orders) {
-			Turnover turnover = order.getTurnover();
-			boolean takeaway = DodoroUtil.isTakeaway(turnover);
+		if (!CollectionUtils.isEmpty(orders)) {
+			for (Order order : orders) {
+				Turnover turnover = order.getTurnover();
+				boolean takeaway = DodoroUtil.isTakeaway(turnover);
 
-			Integer discount = turnover.getDiscount();
-			// 0 表示免单，空表示无折扣
-			if (discount == null) {
-				discount = 100;
-			} else if (discount > 0) {
-				discount = 100 - discount;
-			}
+				Integer discount = turnover.getDiscount();
+				// 0 表示免单，空表示无折扣
+				if (discount == null) {
+					discount = 100;
+				} else if (discount > 0) {
+					discount = 100 - discount;
+				}
 
-			Product product = order.getProduct();
-			int count = order.getCount();
-			int productPrice = product.getProductPrice();
-			int attSum = 0;
-			List<OrderAttribution> orderAttributions = order.getOrderAttributions();
-			if (!CollectionUtils.isEmpty(orderAttributions)) {
-				for (OrderAttribution oa : orderAttributions) {
-					attSum += oa.getCount() * oa.getAttribution().getAttributionPrice();
+				Product product = order.getProduct();
+				int count = order.getCount();
+				int productPrice = product.getProductPrice();
+				int attSum = 0;
+				List<OrderAttribution> orderAttributions = order.getOrderAttributions();
+				if (!CollectionUtils.isEmpty(orderAttributions)) {
+					for (OrderAttribution oa : orderAttributions) {
+						attSum += oa.getCount() * oa.getAttribution().getAttributionPrice();
+					}
+				}
+				int subTotal = (productPrice * count + attSum) * discount;
+
+				total += subTotal;
+				String taxgroupId = product.getTaxgroupId() + "_" + takeaway;
+				if (kindTotalMap.containsKey(taxgroupId)) {
+					Integer kindTotal = kindTotalMap.get(taxgroupId);
+					kindTotalMap.put(taxgroupId, kindTotal + subTotal);
+				} else {
+					kindTotalMap.put(taxgroupId, subTotal);
 				}
 			}
-			int subTotal = (productPrice * count + attSum) * discount;
-
-			total += subTotal;
-			String taxgroupId = product.getTaxgroupId() + "_" + takeaway;
-			if (kindTotalMap.containsKey(taxgroupId)) {
-				Integer kindTotal = kindTotalMap.get(taxgroupId);
-				kindTotalMap.put(taxgroupId, kindTotal + subTotal);
-			} else {
-				kindTotalMap.put(taxgroupId, subTotal);
-			}
 		}
-
 		map.put("total", DodoroUtil.getDisplayPrice(DodoroUtil.divide(total, TEN_THOUSAND)));
 
 		Map<String, Taxgroups> taxgroupsMap = getTaxgroupMap();
