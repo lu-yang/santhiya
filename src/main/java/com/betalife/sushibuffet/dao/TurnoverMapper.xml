@@ -59,7 +59,7 @@
 	</delete>
 	
 	<delete id="deleteAll" >
-		DELETE FROM turnover
+		TRUNCATE FROM turnover
 	</delete>
 
 </mapper>

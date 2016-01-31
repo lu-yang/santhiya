@@ -78,7 +78,7 @@
 	</delete>
 	
 	<delete id="deleteAll">
-		DELETE FROM `orderattribution`
+		TRUNCATE FROM `orderattribution`
 	</delete>
 	
 	<update id="update" parameterType="OrderAttribution">

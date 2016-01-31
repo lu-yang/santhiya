@@ -293,7 +293,7 @@ public class CustomerManager {
 
 	}
 
-	public Map<String, Object> getOrdersByDate(Date from, Date to) throws Exception {
+	public Map<String, Object> getOrdersByDate(Date from, Date to, boolean isPrint) throws Exception {
 		Map<String, Date> param = new HashMap<String, Date>();
 		param.put("from", from);
 		param.put("to", to);
@@ -304,8 +304,10 @@ public class CustomerManager {
 		fillOrderAttribution(locale, orders);
 
 		Map<String, Object> map = ledgerTemplete.buildParam(null, orders, null, null);
-		Map<String, Map<String, Object>> barnameParam = ledgerTemplete.buildBarnameParam(map);
-		printManager.printLedger(barnameParam);
+		if (isPrint) {
+			Map<String, Map<String, Object>> barnameParam = ledgerTemplete.buildBarnameParam(map);
+			printManager.printLedger(barnameParam);
+		}
 		return map;
 	}
 

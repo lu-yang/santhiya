@@ -89,7 +89,7 @@
 	</delete>
 
 	<delete id="deleteAll">
-		DELETE FROM takeaway
+		TRUNCATE FROM takeaway
 	</delete>
 
 </mapper>

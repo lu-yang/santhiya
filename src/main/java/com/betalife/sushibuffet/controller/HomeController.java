@@ -259,13 +259,13 @@ public class HomeController {
 
 	// 打印指定时间内的总单
 	@RequestMapping(value = "ledger/{from}/{to}", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody Map<String, Object> ledger(@PathVariable String from, @PathVariable String to)
-			throws Exception {
+	public @ResponseBody Map<String, Object> ledger(@PathVariable String from, @PathVariable String to,
+			@PathVariable boolean isPrint) throws Exception {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date fromDate = sdf.parse(from);
 		Date toDate = sdf.parse(to);
 
-		Map<String, Object> map = customerManager.getOrdersByDate(fromDate, toDate);
+		Map<String, Object> map = customerManager.getOrdersByDate(fromDate, toDate, isPrint);
 		return map;
 	}
 

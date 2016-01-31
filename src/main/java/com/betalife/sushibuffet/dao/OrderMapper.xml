@@ -154,7 +154,7 @@
 	</delete>
 
 	<delete id="deleteAll">
-		DELETE FROM `order`
+		TRUNCATE FROM `order`
 	</delete>
 
 </mapper>
