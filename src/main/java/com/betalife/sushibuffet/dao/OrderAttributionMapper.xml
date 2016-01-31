@@ -78,7 +78,7 @@
 	</delete>
 	
 	<delete id="deleteAll">
-		TRUNCATE FROM `orderattribution`
+		TRUNCATE TABLE `orderattribution`
 	</delete>
 	
 	<update id="update" parameterType="OrderAttribution">

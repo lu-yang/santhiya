@@ -154,7 +154,7 @@
 	</delete>
 
 	<delete id="deleteAll">
-		TRUNCATE FROM `order`
+		TRUNCATE TABLE `order`
 	</delete>
 
 </mapper>

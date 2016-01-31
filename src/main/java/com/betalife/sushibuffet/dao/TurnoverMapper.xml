@@ -59,7 +59,7 @@
 	</delete>
 	
 	<delete id="deleteAll" >
-		TRUNCATE FROM turnover
+		TRUNCATE TABLE turnover
 	</delete>
 
 </mapper>
