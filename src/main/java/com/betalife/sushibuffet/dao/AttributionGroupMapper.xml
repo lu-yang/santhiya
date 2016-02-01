@@ -5,7 +5,7 @@
 <mapper namespace="com.betalife.sushibuffet.dao.AttributionGroupMapper">
 	
 	<resultMap id="attributionGroupResult" type="AttributionGroup">
-		<id property="id" column="attribution_group_id" />
+		<result property="id" column="attribution_group_id" />
 		<result property="productId" column="product_id" />
 		<result property="attributionGroupType" column="attribution_group_type" />
 		<result property="attributionGroupStatus" column="attribution_group_status" />
