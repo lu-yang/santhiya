@@ -4,6 +4,7 @@ import static com.betalife.sushibuffet.util.DodoroUtil.HUNDRED;
 import static com.betalife.sushibuffet.util.DodoroUtil.TEN_THOUSAND;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Taxgroups;
 import com.betalife.sushibuffet.model.Turnover;
 import com.betalife.sushibuffet.util.DodoroUtil;
+import com.betalife.sushibuffet.util.KeyValue;
 
 @Component
 public class LedgerTemplete extends ContentTemplete {
@@ -43,11 +45,11 @@ public class LedgerTemplete extends ContentTemplete {
 
 		int total = 0;
 		Map<String, Integer> kindTotalMap = new HashMap<String, Integer>();
+		Map<Integer, KeyValue<Turnover, Integer>> turnoverTotalMap = new HashMap<Integer, KeyValue<Turnover, Integer>>();
+		Map<Object, Taxgroups> taxgroupsMap = getTaxgroupMap();
 		if (!CollectionUtils.isEmpty(orders)) {
 			for (Order order : orders) {
 				Turnover turnover = order.getTurnover();
-				boolean takeaway = DodoroUtil.isTakeaway(turnover);
-
 				Integer discount = turnover.getDiscount();
 				// 0 表示免单，空表示无折扣
 				if (discount == null) {
@@ -67,20 +69,48 @@ public class LedgerTemplete extends ContentTemplete {
 					}
 				}
 				int subTotal = (productPrice * count + attSum) * discount;
-
 				total += subTotal;
+
+				boolean takeaway = DodoroUtil.isTakeaway(turnover);
 				String taxgroupId = product.getTaxgroupId() + "_" + takeaway;
+
 				if (kindTotalMap.containsKey(taxgroupId)) {
 					Integer kindTotal = kindTotalMap.get(taxgroupId);
 					kindTotalMap.put(taxgroupId, kindTotal + subTotal);
 				} else {
 					kindTotalMap.put(taxgroupId, subTotal);
 				}
+
+				KeyValue<Turnover, Integer> keyValue = null;
+				if (!turnoverTotalMap.containsKey(turnover.getId())) {
+					keyValue = new KeyValue<Turnover, Integer>(turnover, 0);
+					turnoverTotalMap.put(turnover.getId(), keyValue);
+				} else {
+					keyValue = turnoverTotalMap.get(turnover.getId());
+				}
+				keyValue.setValue(keyValue.getValue() + subTotal);
+
 			}
 		}
+		List<Map<String, Object>> turnovers = new ArrayList<Map<String, Object>>();
+		map.put("turnovers", turnovers);
+		for (KeyValue<Turnover, Integer> keyVaule : turnoverTotalMap.values()) {
+			Turnover turnover = keyVaule.getKey();
+			Integer value = keyVaule.getValue();
+			Map<String, Object> one = new HashMap<String, Object>();
+			one.put("paid", DodoroUtil.divide(value, HUNDRED));
+			boolean takeaway = DodoroUtil.isTakeaway(turnover);
+			one.put("takeaway", takeaway);
+			if (takeaway) {
+				one.put("no", turnover.getTakeawayId());
+			} else {
+				one.put("no", turnover.getTableId());
+			}
+			turnovers.add(one);
+		}
+
 		map.put("total", DodoroUtil.getDisplayPrice(DodoroUtil.divide(total, TEN_THOUSAND)));
 
-		Map<String, Taxgroups> taxgroupsMap = getTaxgroupMap();
 		Taxgroups foodTax = taxgroupsMap.get(FOOD);
 		Taxgroups alcoholTax = taxgroupsMap.get(ALCOHOL);
 

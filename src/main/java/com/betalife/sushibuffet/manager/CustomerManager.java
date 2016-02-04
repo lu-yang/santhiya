@@ -293,7 +293,7 @@ public class CustomerManager {
 
 	}
 
-	public Map<String, Object> getOrdersByDate(Date from, Date to, boolean isPrint) throws Exception {
+	public Map<String, Object> ledger(Date from, Date to, boolean isPrint) throws Exception {
 		Map<String, Date> param = new HashMap<String, Date>();
 		param.put("from", from);
 		param.put("to", to);

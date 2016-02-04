@@ -265,7 +265,7 @@ public class HomeController {
 		Date fromDate = sdf.parse(from);
 		Date toDate = sdf.parse(to);
 
-		Map<String, Object> map = customerManager.getOrdersByDate(fromDate, toDate, isPrint);
+		Map<String, Object> map = customerManager.ledger(fromDate, toDate, isPrint);
 		return map;
 	}
 

@@ -17,3 +17,12 @@
 \u001b|bC\u001b|cATotal : ${total} Eur\n\n
 
 <#-- footer -->
+
+<#list turnovers as one>
+	<#if one.takeaway>
+	外卖${one['no']}
+	<#else>
+	桌号${one['no']}
+	</#if>
+	${one['paid']}
+</#list>

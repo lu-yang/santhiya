@@ -118,11 +118,12 @@ public abstract class ContentTemplete {
 		}
 	}
 
-	protected Map<String, Taxgroups> getTaxgroupMap() {
+	protected Map<Object, Taxgroups> getTaxgroupMap() {
 		List<Taxgroups> taxgroups = taxgroupsMapper.selectAll();
-		Map<String, Taxgroups> taxgroupMap = new HashMap<String, Taxgroups>();
+		Map<Object, Taxgroups> taxgroupMap = new HashMap<Object, Taxgroups>();
 		for (Taxgroups taxgroup : taxgroups) {
 			taxgroupMap.put(taxgroup.getName(), taxgroup);
+			taxgroupMap.put(taxgroup.getId(), taxgroup);
 		}
 		return taxgroupMap;
 	}

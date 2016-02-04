@@ -108,7 +108,7 @@ public class ReceiptTemplete extends ContentTemplete {
 
 		map.put("total", DodoroUtil.getDisplayPrice(total));
 
-		Map<String, Taxgroups> taxgroupsMap = getTaxgroupMap();
+		Map<Object, Taxgroups> taxgroupsMap = getTaxgroupMap();
 		Taxgroups foodTax = taxgroupsMap.get(FOOD);
 		Taxgroups alcoholTax = taxgroupsMap.get(ALCOHOL);
 
