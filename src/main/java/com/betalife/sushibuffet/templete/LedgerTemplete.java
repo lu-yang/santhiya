@@ -98,7 +98,7 @@ public class LedgerTemplete extends ContentTemplete {
 			Turnover turnover = keyVaule.getKey();
 			Integer value = keyVaule.getValue();
 			Map<String, Object> one = new HashMap<String, Object>();
-			one.put("paid", DodoroUtil.divide(value, HUNDRED));
+			one.put("paid", DodoroUtil.divide(value,  TEN_THOUSAND));
 			boolean takeaway = DodoroUtil.isTakeaway(turnover);
 			one.put("takeaway", takeaway);
 			if (takeaway) {
