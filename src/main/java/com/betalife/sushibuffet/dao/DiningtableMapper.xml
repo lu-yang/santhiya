@@ -20,7 +20,7 @@
 
 
 	<select id="selectTables" parameterType="int" resultMap="diningtableResult">
-		SELECT d.id, d.available, t.checkout, t.id AS turnover_id,  t.first_table_id, t.table_id, t.discount, tn.takeaway_id, tn.payment   
+		SELECT d.id, d.available, t.checkout, t.id AS turnover_id,  t.first_table_id, t.table_id, t.discount, t.takeaway_id, t.payment   
 		FROM diningtable d LEFT JOIN
 		  (
 		  	SELECT tn.checkout, tn.id, tn.table_id, tn.first_table_id, tn.discount, tn.takeaway_id, tn.payment  
