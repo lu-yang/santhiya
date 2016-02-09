@@ -28,14 +28,14 @@
 		    (
 		     SELECT MAX(id) AS id 
 		     FROM turnover 
-		     <if test="id != null">
-				WHERE table_id = ＃{id} 
-			 </if>
 		     GROUP BY table_id
 		     ) tm 
 		     WHERE tn.id = tm.id
 		  ) t 
 		  ON d.id = t.table_id 
+		  <if test="id != null">
+			WHERE d.table_id = ＃{id} 
+		  </if>
 	</select>
 
 </mapper>
