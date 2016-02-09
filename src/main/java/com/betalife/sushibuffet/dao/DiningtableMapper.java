@@ -5,5 +5,5 @@ import java.util.List;
 import com.betalife.sushibuffet.model.Diningtable;
 
 public interface DiningtableMapper {
-	List<Diningtable> selectTables();
+	List<Diningtable> selectTables(Integer tableId);
 }

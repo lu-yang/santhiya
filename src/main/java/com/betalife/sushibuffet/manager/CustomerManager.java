@@ -88,10 +88,16 @@ public class CustomerManager {
 
 	@Transactional(rollbackFor = Exception.class)
 	public Turnover openTable(Turnover turnover) {
-		turnover.setFirstTableId(turnover.getTableId());
-		turnoverMapper.insert(turnover);
+		Integer tableId = turnover.getTableId();
+		List<Diningtable> tables = tableMapper.selectTables(tableId);
+		if (CollectionUtils.isEmpty(tables)) {
+			turnover.setFirstTableId(tableId);
+			turnoverMapper.insert(turnover);
+			return turnoverMapper.select(turnover);
+		} else {
+			return tables.get(0).getTurnover();
+		}
 
-		return turnoverMapper.select(turnover);
 	}
 
 	public Turnover get(Turnover turnover) {
@@ -136,8 +142,8 @@ public class CustomerManager {
 		return categoryMapper.selectByParentId(category);
 	}
 
-	public List<Diningtable> getTables() {
-		return tableMapper.selectTables();
+	public List<Diningtable> getTables(Integer tableId) {
+		return tableMapper.selectTables(tableId);
 	}
 
 	@Autowired
@@ -222,7 +228,7 @@ public class CustomerManager {
 					Order model = new Order();
 					model.setId(o.getId());
 					model.setCount(count);
-					model.setPrinted(isPrint);
+					// model.setPrinted(isPrint);
 					orderMapper.update(model);
 					o.setModified(o.getCount() > 0 ? 1 : 2);
 				}

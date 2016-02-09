@@ -54,7 +54,7 @@ public class HomeController {
 	// 取所有桌子状态
 	@RequestMapping(value = "availableTables", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody DiningtableListExchange fetchAllTables() {
-		List<Diningtable> allTables = customerManager.getTables();
+		List<Diningtable> allTables = customerManager.getTables(null);
 		DiningtableListExchange exchange = new DiningtableListExchange();
 		exchange.setList(allTables.toArray(new Diningtable[0]));
 		return exchange;

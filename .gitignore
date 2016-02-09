@@ -2,15 +2,10 @@ target
 .settings
 gen
 .DS_Store
-<<<<<<< Updated upstream
 .project
 .classpath
 
 /bin/
-=======
-
-src/main/resources/printers.properties
->>>>>>> Stashed changes
 
 src/main/resources/printers.properties
 

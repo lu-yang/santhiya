@@ -13,19 +13,24 @@
 			<result property="tableId" column="table_id" />
 			<result property="firstTableId" column="first_table_id" />
 			<result property="discount" column="discount" />
+			<result property="takeawayId" column="takeaway_id" />
+			<result property="payment" column="payment" />
 		</association>
 	</resultMap>
 
 
-	<select id="selectTables" resultMap="diningtableResult">
-		SELECT d.id, d.available, t.checkout, t.id AS turnover_id,  t.first_table_id, t.table_id, t.discount  
+	<select id="selectTables" parameterType="int" resultMap="diningtableResult">
+		SELECT d.id, d.available, t.checkout, t.id AS turnover_id,  t.first_table_id, t.table_id, t.discount, tn.takeaway_id, tn.payment   
 		FROM diningtable d LEFT JOIN
 		  (
-		  	SELECT tn.checkout, tn.id, tn.table_id, tn.first_table_id, tn.discount  
+		  	SELECT tn.checkout, tn.id, tn.table_id, tn.first_table_id, tn.discount, tn.takeaway_id, tn.payment  
 		   	FROM turnover tn,
 		    (
 		     SELECT MAX(id) AS id 
 		     FROM turnover 
+		     <if test="id != null">
+				WHERE table_id = {id} 
+			 </if>
 		     GROUP BY table_id
 		     ) tm 
 		     WHERE tn.id = tm.id
