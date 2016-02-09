@@ -90,7 +90,8 @@ public class CustomerManager {
 	public Turnover openTable(Turnover turnover) {
 		Integer tableId = turnover.getTableId();
 		List<Diningtable> tables = tableMapper.selectTables(tableId);
-		if (CollectionUtils.isEmpty(tables) || tables.get(0).getTurnover().isCheckout()) {
+		if (CollectionUtils.isEmpty(tables) || tables.get(0).getTurnover() == null
+				|| tables.get(0).getTurnover().isCheckout()) {
 			turnover.setFirstTableId(tableId);
 			turnoverMapper.insert(turnover);
 			return turnoverMapper.select(turnover);
