@@ -34,7 +34,7 @@
 		  ) t 
 		  ON d.id = t.table_id 
 		  <if test="id != null">
-			WHERE d.table_id = #{id} 
+			WHERE d.id = #{id}
 		  </if>
 	</select>
 
