@@ -26,7 +26,7 @@ public class Order extends BaseModel {
 	private Integer modified;
 	private Integer status;
 
-	private Boolean printed = false;
+	private Boolean printed;
 
 	private List<OrderAttribution> orderAttributions;
 
