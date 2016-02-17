@@ -12,4 +12,6 @@ public interface KitchenOrderMapper {
 
 	List<Order> selectServedDishes();
 
+	List<Order> selectCombos();
+
 }

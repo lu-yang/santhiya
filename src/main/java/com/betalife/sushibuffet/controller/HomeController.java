@@ -374,6 +374,14 @@ public class HomeController {
 		return exchange;
 	}
 
+	@RequestMapping(value = "kitchen/combo/orders", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody OrderListExchange getCombo() {
+		List<Order> list = customerManager.selectCombos();
+		OrderListExchange exchange = new OrderListExchange();
+		exchange.setList(list.toArray(new Order[0]));
+		return exchange;
+	}
+
 	@RequestMapping(value = "kitchen/served/orders", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody OrderListExchange getServeddish() {
 		List<Order> list = customerManager.selectServedDishes();
@@ -402,6 +410,12 @@ public class HomeController {
 		return getColddish();
 	}
 
+	@RequestMapping(value = "order/serve/combo/{id}", method = RequestMethod.PUT, produces = "application/json")
+	public @ResponseBody OrderListExchange serveComboOrder(@PathVariable int id) {
+		customerManager.serveOrder(id, 0);
+		return getCombo();
+	}
+
 	@RequestMapping(value = "order/revert/{id}", method = RequestMethod.PUT, produces = "application/json")
 	public @ResponseBody Map<String, Object> revertOrder(@PathVariable int id) {
 		customerManager.serveOrder(id, 1);
@@ -413,9 +427,11 @@ public class HomeController {
 		List<Order> coldDishes = customerManager.selectColdDishes();
 		List<Order> hotDishes = customerManager.selectHotDishes();
 		List<Order> servedDishes = customerManager.selectServedDishes();
+		List<Order> combos = customerManager.selectCombos();
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("coldDishes", coldDishes);
 		map.put("hotDishes", hotDishes);
+		map.put("combos", combos);
 		map.put("servedDishes", servedDishes);
 		return map;
 	}

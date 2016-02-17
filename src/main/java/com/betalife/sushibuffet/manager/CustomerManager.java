@@ -494,6 +494,12 @@ public class CustomerManager {
 		return list;
 	}
 
+	public List<Order> selectCombos() {
+		List<Order> list = kitchenOrderMapper.selectCombos();
+		fillOrderAttribution(kitchenLocale, list);
+		return list;
+	}
+
 	public List<Order> selectServedDishes() {
 		List<Order> list = kitchenOrderMapper.selectServedDishes();
 		fillOrderAttribution(kitchenLocale, list);
