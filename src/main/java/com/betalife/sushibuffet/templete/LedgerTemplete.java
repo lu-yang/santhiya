@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.betalife.sushibuffet.model.KeyValue;
 import com.betalife.sushibuffet.model.Order;
 import com.betalife.sushibuffet.model.OrderAttribution;
 import com.betalife.sushibuffet.model.Product;
@@ -21,7 +22,6 @@ import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Taxgroups;
 import com.betalife.sushibuffet.model.Turnover;
 import com.betalife.sushibuffet.util.DodoroUtil;
-import com.betalife.sushibuffet.util.KeyValue;
 
 @Component
 public class LedgerTemplete extends ContentTemplete {

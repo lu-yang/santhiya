@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.betalife.sushibuffet.dao.TurnoverAttributeMapper">
+
+	<insert id="insert" parameterType="TurnoverAttribute">
+		INSERT INTO turnoverattribute
+		(turnover_id, attribute_name, attribute_value)
+		VALUES
+		(#{turnoverId}, #{attributeName}, #{attributeValue})
+	</insert>
+
+	<update id="update" parameterType="TurnoverAttribute">
+		UPDATE turnoverattribute
+		SET attribute_value=#{attributeValue}
+		WHERE turnover_id=#{turnoverId} and attribute_name=#{attributeName}
+	</update>
+
+	<select id="select" parameterType="TurnoverAttribute" resultType="TurnoverAttribute">
+		SELECT
+		turnover_id, attribute_name, attribute_value
+		FROM turnoverattribute
+		WHERE turnover_id=#{turnoverId} and attribute_name=#{attributeName}
+	</select>
+	
+	<select id="selectList" resultType="TurnoverAttribute" parameterType="TurnoverAttribute">
+		SELECT
+		turnover_id, attribute_name, attribute_value
+		FROM turnoverattribute
+		<if test="attributes != null">
+			WHERE 
+			<foreach item="one" index="index" collection="attributes" open="(" separator="or" close=")">
+			     turnover_id=#{one.turnoverId} and attribute_name=#{one.attributeName}
+			</foreach>
+		</if>
+	</select>
+	
+	<delete id="delete" parameterType="TurnoverAttribute">
+		DELETE FROM turnoverattribute
+		WHERE 
+		<foreach item="one" index="index" collection="attributes" open="(" separator="or" close=")">
+		     turnover_id=#{one.turnoverId} and attribute_name=#{one.attributeName}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteAll" >
+		TRUNCATE TABLE turnoverattribute
+	</delete>
+
+</mapper>

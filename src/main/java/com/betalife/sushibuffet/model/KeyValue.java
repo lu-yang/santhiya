@@ -1,4 +1,4 @@
-package com.betalife.sushibuffet.util;
+package com.betalife.sushibuffet.model;
 
 public class KeyValue<K, V> {
 

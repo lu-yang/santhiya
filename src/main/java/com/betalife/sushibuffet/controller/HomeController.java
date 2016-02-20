@@ -40,6 +40,7 @@ import com.betalife.sushibuffet.model.Order;
 import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Turnover;
+import com.betalife.sushibuffet.model.TurnoverAttribute;
 import com.betalife.sushibuffet.util.Constant;
 
 @Controller
@@ -215,6 +216,15 @@ public class HomeController {
 	@RequestMapping(value = "turnover", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
 	public @ResponseBody BooleanExchange updateTurnover(@RequestBody Turnover turnover) {
 		customerManager.update(turnover);
+		BooleanExchange exchange = new BooleanExchange();
+		exchange.setModel(true);
+		return exchange;
+	}
+
+	// 更新turnover_attributes
+	@RequestMapping(value = "turnover/attribute", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
+	public @ResponseBody BooleanExchange updateTurnoverAttribute(@RequestBody List<TurnoverAttribute> list) {
+		customerManager.update(list);
 		BooleanExchange exchange = new BooleanExchange();
 		exchange.setModel(true);
 		return exchange;

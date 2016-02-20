@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.betalife.santhiya.util.UpdateClassify;
 import com.betalife.sushibuffet.dao.AttributionGroupMapper;
 import com.betalife.sushibuffet.dao.CategoryMapper;
 import com.betalife.sushibuffet.dao.DiningtableMapper;
@@ -23,6 +24,7 @@ import com.betalife.sushibuffet.dao.OrderMapper;
 import com.betalife.sushibuffet.dao.ProductMapper;
 import com.betalife.sushibuffet.dao.SettingsMapper;
 import com.betalife.sushibuffet.dao.TakeawayMapper;
+import com.betalife.sushibuffet.dao.TurnoverAttributeMapper;
 import com.betalife.sushibuffet.dao.TurnoverMapper;
 import com.betalife.sushibuffet.model.AttributionGroup;
 import com.betalife.sushibuffet.model.Category;
@@ -32,6 +34,7 @@ import com.betalife.sushibuffet.model.OrderAttribution;
 import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Turnover;
+import com.betalife.sushibuffet.model.TurnoverAttribute;
 import com.betalife.sushibuffet.print.PrintManager;
 import com.betalife.sushibuffet.templete.LedgerTemplete;
 import com.betalife.sushibuffet.util.Constant;
@@ -50,6 +53,9 @@ public class CustomerManager {
 
 	@Autowired
 	private TurnoverMapper turnoverMapper;
+
+	@Autowired
+	private TurnoverAttributeMapper turnoverAttributeMapper;
 
 	@Autowired
 	private CategoryMapper categoryMapper;
@@ -521,6 +527,23 @@ public class CustomerManager {
 		o.setId(id);
 		o.setStatus(status);
 		orderMapper.update(o);
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public void update(List<TurnoverAttribute> list) {
+		List<TurnoverAttribute> attributes = turnoverAttributeMapper.selectList(list);
+
+		String[] idStrList = { "turnoverId", "attributeName" };
+		UpdateClassify updateClassify = new UpdateClassify(list, attributes, idStrList);
+		List<TurnoverAttribute> insertList = updateClassify.getInsertList();
+		List<TurnoverAttribute> updateList = updateClassify.getUpdateList();
+		for (TurnoverAttribute t : updateList) {
+			turnoverAttributeMapper.update(t);
+		}
+		for (TurnoverAttribute t : insertList) {
+			turnoverAttributeMapper.insert(t);
+		}
+
 	}
 
 }
