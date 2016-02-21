@@ -56,6 +56,11 @@
 		</foreach>
 	</delete>
 	
+	<delete id="deleteByTurnover" parameterType="Turnover">
+		DELETE FROM turnoverattribute
+		WHERE turnover_id=#{id}
+	</delete>
+	
 	<delete id="deleteAll" >
 		TRUNCATE TABLE turnoverattribute
 	</delete>

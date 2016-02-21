@@ -382,6 +382,7 @@ public class CustomerManager {
 		Map<String, Integer> params = new HashMap<String, Integer>();
 		params.put("turnoverId", t.getId());
 		orderAttributionMapper.delete(params);
+		turnoverAttributeMapper.deleteByTurnover(t);
 		turnoverMapper.delete(t);
 	}
 
@@ -524,6 +525,7 @@ public class CustomerManager {
 		orderAttributionMapper.deleteAll();
 		orderMapper.deleteAll();
 		turnoverMapper.deleteAll();
+		turnoverAttributeMapper.deleteAll();
 		takeawayMapper.deleteAll();
 	}
 

@@ -21,4 +21,6 @@ public interface TurnoverAttributeMapper {
 	void deleteAll();
 
 	List<TurnoverAttribute> selectListByTurnovers(@Param("turnovers") List<Turnover> turnovers);
+
+	void deleteByTurnover(Turnover t);
 }
