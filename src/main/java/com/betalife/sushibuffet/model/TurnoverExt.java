@@ -1,5 +1,6 @@
 package com.betalife.sushibuffet.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TurnoverExt extends Turnover {
@@ -19,6 +20,13 @@ public class TurnoverExt extends Turnover {
 	@Override
 	public String toString() {
 		return super.toString() + ", Turnover Attributes [" + attributes + "]";
+	}
+
+	public void addAttribute(TurnoverAttribute turnoverAttribute) {
+		if (attributes == null) {
+			attributes = new ArrayList<TurnoverAttribute>();
+		}
+		attributes.add(turnoverAttribute);
 	}
 
 }

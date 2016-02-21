@@ -2,16 +2,20 @@ package com.betalife.sushibuffet.model;
 
 public class TurnoverAttribute {
 
+	public enum TurnoverAttributeName {
+		MARK;
+	}
+
 	private static final long serialVersionUID = 1L;
-	private String turnoverId;
+	private Integer turnoverId;
 	private String attributeName;
 	private String attributeValue;
 
-	public String getTurnoverId() {
+	public Integer getTurnoverId() {
 		return turnoverId;
 	}
 
-	public void setTurnoverId(String turnoverId) {
+	public void setTurnoverId(Integer turnoverId) {
 		this.turnoverId = turnoverId;
 	}
 

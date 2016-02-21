@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.betalife.sushibuffet.model.Turnover;
 import com.betalife.sushibuffet.model.TurnoverAttribute;
 
 public interface TurnoverAttributeMapper {
@@ -18,4 +19,6 @@ public interface TurnoverAttributeMapper {
 	void delete(@Param("attributes") List<TurnoverAttribute> attributes);
 
 	void deleteAll();
+
+	List<TurnoverAttribute> selectListByTurnovers(@Param("turnovers") List<Turnover> turnovers);
 }

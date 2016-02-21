@@ -87,4 +87,20 @@ public class Turnover extends BaseModel {
 		return "Turnover [tableId=" + tableId + ", checkout=" + checkout + ", id=" + id + "]";
 	}
 
+	public TurnoverExt toTurnoverExt() {
+		TurnoverExt turnoverExt = new TurnoverExt();
+		turnoverExt.setId(id);
+		turnoverExt.setTableId(tableId);
+		turnoverExt.setCheckout(checkout);
+		turnoverExt.setFirstTableId(firstTableId);
+		turnoverExt.setDiscount(discount);
+		turnoverExt.setTakeawayId(takeawayId);
+		turnoverExt.setPayment(payment);
+
+		turnoverExt.setCreated(created);
+		turnoverExt.setUpdated(updated);
+
+		return turnoverExt;
+	}
+
 }

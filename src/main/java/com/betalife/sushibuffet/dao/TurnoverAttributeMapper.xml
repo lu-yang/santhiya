@@ -36,6 +36,18 @@
 		</if>
 	</select>
 	
+	<select id="selectListByTurnovers" resultType="TurnoverAttribute" parameterType="Turnover">
+		SELECT
+		turnover_id, attribute_name, attribute_value
+		FROM turnoverattribute
+		<if test="turnovers != null">
+			WHERE 
+			<foreach item="one" index="index" collection="turnovers" open="(" separator="or" close=")">
+			     turnover_id=#{one.id}
+			</foreach>
+		</if>
+	</select>
+	
 	<delete id="delete" parameterType="TurnoverAttribute">
 		DELETE FROM turnoverattribute
 		WHERE 

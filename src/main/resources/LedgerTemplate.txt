@@ -25,4 +25,10 @@
 	t-${one['no']}
 	</#if>
 	${one['paid']}
+	<#if one.mark??>
+	*
+	</#if>
 </#list>
+
+mark turnover count: ${one['markCount']}
+mark turnover total paid: ${one['markTotal']}

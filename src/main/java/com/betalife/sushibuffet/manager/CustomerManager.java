@@ -35,6 +35,7 @@ import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Turnover;
 import com.betalife.sushibuffet.model.TurnoverAttribute;
+import com.betalife.sushibuffet.model.TurnoverExt;
 import com.betalife.sushibuffet.print.PrintManager;
 import com.betalife.sushibuffet.templete.LedgerTemplete;
 import com.betalife.sushibuffet.util.Constant;
@@ -303,7 +304,6 @@ public class CustomerManager {
 				parent.addOrderAttribution(one);
 			}
 		}
-
 	}
 
 	public Map<String, Object> ledger(Date from, Date to, boolean isPrint) throws Exception {
@@ -313,6 +313,41 @@ public class CustomerManager {
 		List<Order> orders = orderMapper.selectOrdersByDate(param);
 
 		fillOrderAttribution(locale, orders);
+		Map<Integer, Turnover> turnoverMap = new HashMap<Integer, Turnover>();
+		Map<Integer, List<Order>> turnoverOrdersMap = new HashMap<Integer, List<Order>>();
+		for (Order order : orders) {
+			Turnover turnover = order.getTurnover();
+			int turnoverId = turnover.getId();
+			List<Order> list = turnoverOrdersMap.get(turnoverId);
+			if (!turnoverMap.containsKey(turnoverId)) {
+				turnoverMap.put(turnoverId, turnover);
+				list = new ArrayList<Order>();
+				turnoverOrdersMap.put(turnoverId, list);
+			}
+			list.add(order);
+		}
+		List<Turnover> turnovers = new ArrayList<Turnover>(turnoverMap.values());
+		List<TurnoverAttribute> turnoverAttributes = turnoverAttributeMapper.selectListByTurnovers(turnovers);
+		for (TurnoverAttribute turnoverAttribute : turnoverAttributes) {
+			Integer turnoverId = turnoverAttribute.getTurnoverId();
+			Turnover turnover = turnoverMap.get(turnoverId);
+			TurnoverExt turnoverExt = null;
+			if (turnover instanceof TurnoverExt) {
+				turnoverExt = (TurnoverExt) turnover;
+			} else {
+				turnoverExt = turnover.toTurnoverExt();
+				turnoverMap.put(turnoverId, turnoverExt);
+			}
+			turnoverExt.addAttribute(turnoverAttribute);
+		}
+
+		for (Integer turnoverId : turnoverOrdersMap.keySet()) {
+			List<Order> list = turnoverOrdersMap.get(turnoverId);
+			Turnover turnover = turnoverMap.get(turnoverId);
+			for (Order order : list) {
+				order.setTurnover(turnover);
+			}
+		}
 
 		Map<String, Object> map = ledgerTemplete.buildParam(null, orders, null, null);
 		if (isPrint) {

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -21,6 +22,9 @@ import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Taxgroups;
 import com.betalife.sushibuffet.model.Turnover;
+import com.betalife.sushibuffet.model.TurnoverAttribute;
+import com.betalife.sushibuffet.model.TurnoverAttribute.TurnoverAttributeName;
+import com.betalife.sushibuffet.model.TurnoverExt;
 import com.betalife.sushibuffet.util.DodoroUtil;
 
 @Component
@@ -43,62 +47,68 @@ public class LedgerTemplete extends ContentTemplete {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("date", sdf.format(new Date()));
 
-		int total = 0;
-		Map<String, Integer> kindTotalMap = new HashMap<String, Integer>();
-		Map<Integer, KeyValue<Turnover, Integer>> turnoverTotalMap = new HashMap<Integer, KeyValue<Turnover, Integer>>();
+		if (CollectionUtils.isEmpty(orders)) {
+			return map;
+		}
+
 		Map<Object, Taxgroups> taxgroupsMap = getTaxgroupMap();
-		if (!CollectionUtils.isEmpty(orders)) {
-			for (Order order : orders) {
-				Turnover turnover = order.getTurnover();
-				Integer discount = turnover.getDiscount();
-				// 0 表示免单，空表示无折扣
-				if (discount == null) {
-					discount = 100;
-				} else if (discount > 0) {
-					discount = 100 - discount;
-				}
-
-				Product product = order.getProduct();
-				int count = order.getCount();
-				int productPrice = product.getProductPrice();
-				int attSum = 0;
-				List<OrderAttribution> orderAttributions = order.getOrderAttributions();
-				if (!CollectionUtils.isEmpty(orderAttributions)) {
-					for (OrderAttribution oa : orderAttributions) {
-						attSum += oa.getCount() * oa.getAttribution().getAttributionPrice();
-					}
-				}
-				int subTotal = (productPrice * count + attSum) * discount;
-				total += subTotal;
-
-				boolean takeaway = DodoroUtil.isTakeaway(turnover);
-				String taxgroupId = product.getTaxgroupId() + "_" + takeaway;
-
-				if (kindTotalMap.containsKey(taxgroupId)) {
-					Integer kindTotal = kindTotalMap.get(taxgroupId);
-					kindTotalMap.put(taxgroupId, kindTotal + subTotal);
-				} else {
-					kindTotalMap.put(taxgroupId, subTotal);
-				}
-
-				KeyValue<Turnover, Integer> keyValue = null;
-				if (!turnoverTotalMap.containsKey(turnover.getId())) {
-					keyValue = new KeyValue<Turnover, Integer>(turnover, 0);
-					turnoverTotalMap.put(turnover.getId(), keyValue);
-				} else {
-					keyValue = turnoverTotalMap.get(turnover.getId());
-				}
-				keyValue.setValue(keyValue.getValue() + subTotal);
-
+		Map<String, Integer> kindTotalMap = new HashMap<String, Integer>();
+		int total = 0;
+		int markCount = 0;
+		BigDecimal markTotal = BigDecimal.ZERO;
+		Map<Integer, KeyValue<Turnover, Integer>> turnoverTotalMap = new HashMap<Integer, KeyValue<Turnover, Integer>>();
+		for (Order order : orders) {
+			Turnover turnover = order.getTurnover();
+			Integer discount = turnover.getDiscount();
+			// 0 表示免单，空表示无折扣
+			if (discount == null) {
+				discount = 100;
+			} else if (discount > 0) {
+				discount = 100 - discount;
 			}
+
+			Product product = order.getProduct();
+			int count = order.getCount();
+			int productPrice = product.getProductPrice();
+			int attSum = 0;
+			List<OrderAttribution> orderAttributions = order.getOrderAttributions();
+			if (!CollectionUtils.isEmpty(orderAttributions)) {
+				for (OrderAttribution oa : orderAttributions) {
+					attSum += oa.getCount() * oa.getAttribution().getAttributionPrice();
+				}
+			}
+			int subTotal = (productPrice * count + attSum) * discount;
+			total += subTotal;
+
+			boolean takeaway = DodoroUtil.isTakeaway(turnover);
+			String taxgroupId = product.getTaxgroupId() + "_" + takeaway;
+
+			if (kindTotalMap.containsKey(taxgroupId)) {
+				Integer kindTotal = kindTotalMap.get(taxgroupId);
+				kindTotalMap.put(taxgroupId, kindTotal + subTotal);
+			} else {
+				kindTotalMap.put(taxgroupId, subTotal);
+			}
+
+			KeyValue<Turnover, Integer> keyValue = null;
+			if (!turnoverTotalMap.containsKey(turnover.getId())) {
+				keyValue = new KeyValue<Turnover, Integer>(turnover, 0);
+				turnoverTotalMap.put(turnover.getId(), keyValue);
+			} else {
+				keyValue = turnoverTotalMap.get(turnover.getId());
+			}
+			keyValue.setValue(keyValue.getValue() + subTotal);
+
 		}
 		List<Map<String, Object>> turnovers = new ArrayList<Map<String, Object>>();
 		map.put("turnovers", turnovers);
+
 		for (KeyValue<Turnover, Integer> keyVaule : turnoverTotalMap.values()) {
 			Turnover turnover = keyVaule.getKey();
 			Integer value = keyVaule.getValue();
 			Map<String, Object> one = new HashMap<String, Object>();
-			one.put("paid", DodoroUtil.divide(value, TEN_THOUSAND));
+			BigDecimal paid = DodoroUtil.divide(value, TEN_THOUSAND);
+			one.put("paid", DodoroUtil.getDisplayPrice(paid));
 			boolean takeaway = DodoroUtil.isTakeaway(turnover);
 			one.put("takeaway", takeaway);
 			if (takeaway) {
@@ -106,10 +116,25 @@ public class LedgerTemplete extends ContentTemplete {
 			} else {
 				one.put("no", turnover.getTableId());
 			}
+			if (turnover instanceof TurnoverExt) {
+				TurnoverExt ext = (TurnoverExt) turnover;
+				List<TurnoverAttribute> attributes = ext.getAttributes();
+				for (TurnoverAttribute turnoverAttribute : attributes) {
+					if (StringUtils.equalsIgnoreCase(turnoverAttribute.getAttributeName(),
+							TurnoverAttributeName.MARK.name())) {
+						if (StringUtils.equals(turnoverAttribute.getAttributeValue(), "true")) {
+							one.put("mark", turnoverAttribute.getAttributeValue());
+							markTotal = markTotal.add(paid);
+							markCount++;
+						}
+					}
+				}
+			}
 			turnovers.add(one);
 		}
-
 		map.put("total", DodoroUtil.getDisplayPrice(DodoroUtil.divide(total, TEN_THOUSAND)));
+		map.put("markTotal", DodoroUtil.getDisplayPrice(markTotal));
+		map.put("markCount", markCount);
 
 		Taxgroups foodTax = taxgroupsMap.get(FOOD);
 		Taxgroups alcoholTax = taxgroupsMap.get(ALCOHOL);
