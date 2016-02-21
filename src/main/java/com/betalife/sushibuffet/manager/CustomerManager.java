@@ -151,12 +151,15 @@ public class CustomerManager {
 		for (Turnover turnover : list) {
 			Order order = new Order();
 			List<TurnoverAttribute> attributes = attributeMap.get(turnover.getId());
-			TurnoverExt turnoverExt = turnover.toTurnoverExt();
-			turnoverExt.setAttributes(attributes);
-			order.setTurnover(turnoverExt);
+			if (attributes != null) {
+				TurnoverExt turnoverExt = turnover.toTurnoverExt();
+				turnoverExt.setAttributes(attributes);
+				turnover = turnoverExt;
+			}
+			order.setTurnover(turnover);
 			List<Order> orders = getOrders(order);
 			Map<String, Object> map = ledgerTemplete.buildParam(null, orders, null, null);
-			map.put("turnover", turnoverExt);
+			map.put("turnover", turnover);
 			result.add(map);
 		}
 		return result;
