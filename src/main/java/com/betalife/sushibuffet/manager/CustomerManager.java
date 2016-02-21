@@ -306,10 +306,14 @@ public class CustomerManager {
 		}
 	}
 
-	public Map<String, Object> ledger(Date from, Date to, boolean isPrint) throws Exception {
-		Map<String, Date> param = new HashMap<String, Date>();
+	public Map<String, Object> ledger(Date from, Date to, boolean isPrint, List<TurnoverAttribute> attributes)
+			throws Exception {
+		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("from", from);
 		param.put("to", to);
+		if (CollectionUtils.isNotEmpty(attributes)) {
+			param.put("attributes", attributes);
+		}
 		List<Order> orders = orderMapper.selectOrdersByDate(param);
 
 		fillOrderAttribution(locale, orders);

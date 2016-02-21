@@ -1,6 +1,5 @@
 package com.betalife.sushibuffet.dao;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,7 @@ public interface OrderMapper {
 
 	Order select(Order o);
 
-	List<Order> selectOrdersByDate(Map<String, Date> map);
+	List<Order> selectOrdersByDate(Map<String, Object> map);
 
 	void delete(Order o);
 

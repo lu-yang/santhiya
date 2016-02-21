@@ -72,9 +72,17 @@
 		SELECT o.id, o.`count`, o.turnover_id, o.product_id, o.updated, o.created, o.`status`, o.modified, o.served,
 			p.taxgroup_id, p.category_id, p.product_price, t.discount, t.checkout, t.takeaway_id, t.table_id, t.payment
 		FROM `order` o, turnover t, product p
+		<if test="attributes != null">, turnoverattribute ta</if>
 		WHERE o.turnover_id = t.id
 		AND o.product_id = p.id
 		AND t.created BETWEEN #{from} AND #{to}
+		<if test="attributes != null">
+		AND t.id = ta.turnover_id AND
+		<foreach item="item" index="index" collection="attributes" open="(" separator="or" close=")">
+		    <!-- http://my.oschina.net/linuxred/blog/38802 foreach 说明 -->
+		 	ta.attribute_name = #{item.attributeName} AND ta.attribute_value = #{item.attributeValue}
+		</foreach>
+		</if>
 	</select>
 
 	<select id="selectOrders" resultMap="orderResult">

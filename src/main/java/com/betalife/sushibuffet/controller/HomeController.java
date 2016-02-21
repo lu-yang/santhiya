@@ -268,14 +268,15 @@ public class HomeController {
 	}
 
 	// 打印指定时间内的总单
-	@RequestMapping(value = "ledger/{from}/{to}/{isPrint}", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "ledger/{from}/{to}/{isPrint}", method = RequestMethod.POST, produces = "application/json")
 	public @ResponseBody Map<String, Object> ledger(@PathVariable String from, @PathVariable String to,
-			@PathVariable boolean isPrint) throws Exception {
+			@PathVariable boolean isPrint, @RequestBody(required = false) List<TurnoverAttribute> attributes)
+					throws Exception {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date fromDate = sdf.parse(from);
 		Date toDate = sdf.parse(to);
 
-		Map<String, Object> map = customerManager.ledger(fromDate, toDate, isPrint);
+		Map<String, Object> map = customerManager.ledger(fromDate, toDate, isPrint, attributes);
 		return map;
 	}
 
