@@ -156,7 +156,7 @@ public class CustomerManager {
 			order.setTurnover(turnoverExt);
 			List<Order> orders = getOrders(order);
 			Map<String, Object> map = ledgerTemplete.buildParam(null, orders, null, null);
-			map.put("turnover", turnover);
+			map.put("turnover", turnoverExt);
 			result.add(map);
 		}
 		return result;
