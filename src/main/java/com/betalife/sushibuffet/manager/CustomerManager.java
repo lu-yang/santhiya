@@ -134,10 +134,26 @@ public class CustomerManager {
 		if (CollectionUtils.isEmpty(list)) {
 			return null;
 		}
+
+		List<TurnoverAttribute> turnoverAttributes = turnoverAttributeMapper.selectListByTurnovers(list);
+		Map<Integer, List<TurnoverAttribute>> attributeMap = new HashMap<Integer, List<TurnoverAttribute>>();
+		for (TurnoverAttribute turnoverAttribute : turnoverAttributes) {
+			Integer turnoverId = turnoverAttribute.getTurnoverId();
+			List<TurnoverAttribute> values = attributeMap.get(turnoverId);
+			if (values == null) {
+				values = new ArrayList<TurnoverAttribute>();
+				attributeMap.put(turnoverId, values);
+			}
+			values.add(turnoverAttribute);
+		}
+
 		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 		for (Turnover turnover : list) {
 			Order order = new Order();
-			order.setTurnover(turnover);
+			List<TurnoverAttribute> attributes = attributeMap.get(turnover.getId());
+			TurnoverExt turnoverExt = turnover.toTurnoverExt();
+			turnoverExt.setAttributes(attributes);
+			order.setTurnover(turnoverExt);
 			List<Order> orders = getOrders(order);
 			Map<String, Object> map = ledgerTemplete.buildParam(null, orders, null, null);
 			map.put("turnover", turnover);
@@ -317,6 +333,17 @@ public class CustomerManager {
 		List<Order> orders = orderMapper.selectOrdersByDate(param);
 
 		fillOrderAttribution(locale, orders);
+		fillTurnoverAttribution(orders);
+
+		Map<String, Object> map = ledgerTemplete.buildParam(null, orders, null, null);
+		if (isPrint) {
+			Map<String, Map<String, Object>> barnameParam = ledgerTemplete.buildBarnameParam(map);
+			printManager.printLedger(barnameParam);
+		}
+		return map;
+	}
+
+	private void fillTurnoverAttribution(List<Order> orders) {
 		Map<Integer, Turnover> turnoverMap = new HashMap<Integer, Turnover>();
 		Map<Integer, List<Order>> turnoverOrdersMap = new HashMap<Integer, List<Order>>();
 		for (Order order : orders) {
@@ -352,13 +379,6 @@ public class CustomerManager {
 				order.setTurnover(turnover);
 			}
 		}
-
-		Map<String, Object> map = ledgerTemplete.buildParam(null, orders, null, null);
-		if (isPrint) {
-			Map<String, Map<String, Object>> barnameParam = ledgerTemplete.buildBarnameParam(map);
-			printManager.printLedger(barnameParam);
-		}
-		return map;
 	}
 
 	@Transactional(rollbackFor = Exception.class)
