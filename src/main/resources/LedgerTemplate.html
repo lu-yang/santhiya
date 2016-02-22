@@ -2,17 +2,17 @@
 <html charset="utf-8">
 <style>
 body {
-	font-family: "Times new roman";
+	font-family: Arial,sans-serif;
 	margin: 0;
 	padding: 0;
 	width: 1480px;
-	font-size: 100pt;
+	font-size: 80pt;
 }
 
-.rep {
+/*.rep {
 	word-wrap: break-all;
 	padding: 0 0 0 0;
-}
+}*/
 
 .fontType {
 	font-family: Georgia;
@@ -20,53 +20,45 @@ body {
 }
 
 .font {
-	font-size: 120pt;
+	font-size: 80pt;
 	font-weight: bold;
 }
 
 .font-lg {
-	font-size: 140pt;
+	font-size: 100pt;
 }
 
 .font-md {
-	font-size: 110pt;
+	font-size: 90pt;
 }
 
 .font-sm {
-	font-size: 90pt;
+	font-size: 80pt;
 }
 
 .text-right {
 	text-align: right;
 }
 
-.attrList {
-	font-size: 15pt;
+.text-center{
+		text-align: center;
 }
 
-.catName {
-	font-size: 90pt;
-}
 
 .count {
-	font-size: 140pt;
+	font-size: 90pt;
 	font-weight: bold;
 }
 
-.top {
-	font-size: 200pt;
-	margin-left: 60px;
-	font-family: KaiTi;
-	font-weight: bold;
-}
+
 
 .table {
 	width: 95%;
 }
 
 .totalPrice {
-	text-align: right;
-	font-size: 130px;
+	text-align: center;
+	font-size: 90px;
 	font-weight: bold;
 }
 
@@ -75,17 +67,17 @@ body {
 	font-size: 90pt;
 }
 
-.col-6 {
-	width: 50%;
-	float: left;
-	position: relative;
-	min-height: 1px;
-	padding-right: 15px;
-	padding-left: 15px;
+table.orderlist {
+font-weight: bold;
+display: inline-block;
+float: left;
 }
+
+
+
 </style>
-<div class="top"></div>
-<div class="rep">
+
+<div >
 	<p class="font">Date: ${date}</p>
 	<p class="font">sur place</p>
 	<table width="100%" class="font-md">
@@ -95,13 +87,13 @@ body {
 			<th>Excl</th>
 			<th>Total</th>
 		</tr>
-		<tr class="container">
+		<tr class="text-center">
 			<td><span class="count">${food_tax}:</span></td>
 			<td>${food_tax_paid} €</td>
 			<td>${food_paid} €</td>
 			<td>${food_total_paid} €</td>
 		</tr>
-		<tr class="container">
+		<tr class="text-center">
 			<td><span class="count">${alcool_tax}:</span></td>
 			<td>${alcool_tax_paid} €</td>
 			<td>${alcool_paid} €</td>
@@ -116,13 +108,13 @@ body {
 			<th>Excl</th>
 			<th>Total</th>
 		</tr>
-		<tr class="container">
+		<tr class="text-center">
 			<td><span class="count">${takeaway_food_tax}:</span></td>
 			<td>${takeaway_food_tax_paid} €</td>
 			<td>${takeaway_food_paid} €</td>
 			<td>${takeaway_food_total_paid} €</td>
 		</tr>
-		<tr class="container">
+		<tr class="text-center">
 			<td><span class="count">${alcool_tax}:</span></td>
 			<td>${takeaway_alcool_tax_paid} €</td>
 			<td>${takeaway_alcool_paid} €</td>
@@ -131,14 +123,28 @@ body {
 	</table>
 	<hr>
 	<p class="totalPrice">Total : ${total} €</p>
+	<br>
+	<p class="text-center">${markCount} Table Total = ${markTotal} €</p>
+	<br>
 
-	<div class="orderlist">
 		<#list turnovers as one>
-		<div class="col-6"><#if one.takeaway> w-${one['no']} <#else>
-			t-${one['no']} </#if> ${one['paid']}</div>
+		<table width="40%" class="orderlist">
+	<tr>
+		<td>
+			<#if one.takeaway>
+			W-${one['no']}
+			<#else>
+				T-${one['no']}
+			</#if>
+				<#if one.mark??> *</#if>
+		</td>
+		<td class="text-right">
+			${one['paid']} €
+		</td>
+	</tr>
+	</table>
 		</#list>
-	</div>
-
+		<br><br>
 
 
 </div>
