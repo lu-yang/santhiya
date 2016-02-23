@@ -72,20 +72,8 @@ public class OrderTemplete extends ContentTemplete {
 		Map<String, List<Map<String, Object>>> barNameMap = new HashMap<String, List<Map<String, Object>>>();
 
 		for (Order order : orders) {
+			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 			Product product = order.getProduct();
-			// String barName = category.getBarName();
-			String barName = product.getBarName();
-			if (StringUtils.isEmpty(barName)) {
-				barName = "empty";
-			}
-			List<Map<String, Object>> list = null;
-			if (barNameMap.containsKey(barName)) {
-				list = barNameMap.get(barName);
-			} else {
-				list = new ArrayList<Map<String, Object>>();
-				barNameMap.put(barName, list);
-			}
-
 			Category category = categoryMap.get(product.getCategoryId());
 			if (category == null) {
 				logger.error("没有CategoryId是" + product.getCategoryId() + "的Category");
@@ -114,6 +102,22 @@ public class OrderTemplete extends ContentTemplete {
 			}
 
 			list.add(one);
+
+			String barName = category.getBarName();
+			// String barName = product.getBarName();
+			if (StringUtils.isEmpty(barName)) {
+				barName = "empty";
+			}
+			String[] barnames = barName.split(",");
+			for (String bn : barnames) {
+				bn = bn.trim();
+				if (barNameMap.containsKey(bn)) {
+					List<Map<String, Object>> values = barNameMap.get(bn);
+					values.addAll(list);
+				} else {
+					barNameMap.put(bn, list);
+				}
+			}
 		}
 
 		Map<String, Map<String, Object>> printerMap = new HashMap<String, Map<String, Object>>();
