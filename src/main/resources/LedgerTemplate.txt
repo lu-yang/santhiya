@@ -30,5 +30,5 @@
 	</#if>
 </#list>
 
-mark turnover count: ${one['markCount']}
-mark turnover total paid: ${one['markTotal']}
+mark turnover count: ${markCount}
+mark turnover total paid: ${markTotal}
