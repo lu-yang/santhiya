@@ -4,6 +4,21 @@
 
 <mapper namespace="com.betalife.sushibuffet.dao.KitchenOrderMapper">
 
+	<resultMap id="kitchenOrderWithGroup" type="OrderProductGroup">
+		<result property="status" column="member_status" />
+
+		<association property="product" javaType="Product">
+			<id property="id" column="member_product_id" />
+			<result property="categoryId" column="member_category_id" />
+			<result property="productName" column="member_product_name" />
+			<result property="productNum" column="member_product_num" />
+			<result property="type" column="member_type" />			
+		</association>
+	
+		<association property="order" resultMap="kitchenOrder" >
+		</association>
+	</resultMap>
+	
 	<resultMap id="kitchenOrder" type="OrderExt">
 		<id property="id" column="order_id" />
 		<result property="count" column="count" />
@@ -26,25 +41,25 @@
 			<result property="name" column="category_name" />
 		</association>
 	</resultMap>
-	
 
-	<select id="selectHotDishes" resultMap="kitchenOrder">
+	<select id="selectHotDishes" resultMap="kitchenOrderWithGroup">
 		SELECT * 
 		FROM hotdish;
 	</select>
 
-	<select id="selectColdDishes" resultMap="kitchenOrder">
+	<select id="selectColdDishes" resultMap="kitchenOrderWithGroup">
 		SELECT * 
 		FROM colddish;
 	</select>
 
-	<select id="selectServedDishes" resultMap="kitchenOrder">
+	<select id="selectServedDishes" resultMap="kitchenOrderWithGroup">
 		SELECT * 
 		FROM servedorder;
 	</select>
-	
+	<!-- 
 	<select id="selectCombos" resultMap="kitchenOrder">
 		SELECT * 
 		FROM combo;
 	</select>
+	 -->
 </mapper>

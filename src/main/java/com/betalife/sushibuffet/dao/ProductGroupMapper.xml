@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.betalife.sushibuffet.dao.ProductMapper">
+	<cache flushInterval="600000"/>
+
+	<resultMap type="KeyValue" id="productGroupMap">
+		<result property="key" column="product_id" />
+		<result property="value" column="member_product_id" />
+	</resultMap>  
+	
+	<select id="selectAll" resultType="productGroupMap">
+		<!-- http://www.iteye.com/problems/80072 -->
+		SELECT
+			product_id, member_product_id
+		FROM
+			productgroup
+	</select>
+
+</mapper>

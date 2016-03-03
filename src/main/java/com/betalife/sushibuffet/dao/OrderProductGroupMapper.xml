@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.betalife.sushibuffet.dao.OrderProductGroupMapper">
+
+	<select id="selectByOrderId" parameterType="Order" resultType="OrderProductGroup">
+		SELECT
+			order_id, product_id, updated, status, served
+		FROM
+			`orderproductgroup`
+		WHERE 
+			order_id = #{order.id}
+	</select>
+	
+	<insert id="insert" parameterType="OrderProductGroup">
+		INSERT INTO `orderproductgroup`
+		(order_id, product_id, `status`, served, updated)
+		VALUES
+		(#{order.id}, #{product.id}, #{status}, #{served}, #{updated})
+	</insert>
+
+	
+	<update id="update" parameterType="OrderProductGroup">
+		UPDATE `orderproductgroup`
+		SET 
+		updated=NOW()
+		<if test="status == 0">
+		, served = NOW()
+		</if>
+		<if test="status != 0">
+		, served = null
+		</if>
+		, status = #{status}
+		WHERE order_id = #{order.id} 
+		AND product_id = #{product.id}
+	</update>
+	
+	<update id="reminder" parameterType="Order">
+		UPDATE `orderproductgroup`
+		SET 
+		updated=NOW()
+		, served = null
+		, status = #{status}
+		WHERE order_id = #{order.id} 
+		AND status != 0
+	</update>
+	
+	<delete id="deleteByOrderId" parameterType="Order">
+		DELETE FROM `orderproductgroup`
+		WHERE order_id=#{order.id}
+	</delete>
+
+	<delete id="deleteAll">
+		TRUNCATE TABLE `orderproductgroup`
+	</delete>
+
+</mapper>

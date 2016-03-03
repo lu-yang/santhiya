@@ -2,16 +2,16 @@ package com.betalife.sushibuffet.dao;
 
 import java.util.List;
 
-import com.betalife.sushibuffet.model.Order;
+import com.betalife.sushibuffet.model.OrderProductGroup;
 
 public interface KitchenOrderMapper {
 
-	List<Order> selectColdDishes();
+	List<OrderProductGroup> selectColdDishes();
 
-	List<Order> selectHotDishes();
+	List<OrderProductGroup> selectHotDishes();
 
-	List<Order> selectServedDishes();
+	List<OrderProductGroup> selectServedDishes();
 
-	List<Order> selectCombos();
+	// List<Order> selectCombos();
 
 }

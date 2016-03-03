@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import com.betalife.sushibuffet.dao.DiningtableMapper;
 import com.betalife.sushibuffet.dao.KitchenOrderMapper;
 import com.betalife.sushibuffet.dao.OrderAttributionMapper;
 import com.betalife.sushibuffet.dao.OrderMapper;
+import com.betalife.sushibuffet.dao.OrderProductGroupMapper;
+import com.betalife.sushibuffet.dao.ProductGroupMapper;
 import com.betalife.sushibuffet.dao.ProductMapper;
 import com.betalife.sushibuffet.dao.SettingsMapper;
 import com.betalife.sushibuffet.dao.TakeawayMapper;
@@ -29,8 +32,10 @@ import com.betalife.sushibuffet.dao.TurnoverMapper;
 import com.betalife.sushibuffet.model.AttributionGroup;
 import com.betalife.sushibuffet.model.Category;
 import com.betalife.sushibuffet.model.Diningtable;
+import com.betalife.sushibuffet.model.KeyValue;
 import com.betalife.sushibuffet.model.Order;
 import com.betalife.sushibuffet.model.OrderAttribution;
+import com.betalife.sushibuffet.model.OrderProductGroup;
 import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Turnover;
@@ -65,7 +70,13 @@ public class CustomerManager {
 	private ProductMapper productMapper;
 
 	@Autowired
+	private ProductGroupMapper productGroupMapper;
+
+	@Autowired
 	private OrderMapper orderMapper;
+
+	@Autowired
+	private OrderProductGroupMapper orderProductGroupMapper;
 
 	@Autowired
 	private TakeawayMapper takeawayMapper;
@@ -209,11 +220,30 @@ public class CustomerManager {
 		return products;
 	}
 
+	public Map<Integer, List<Integer>> getProductGroup() {
+		List<KeyValue<Integer, Integer>> all = productGroupMapper.selectAll();
+		Map<Integer, List<Integer>> map = new HashMap<Integer, List<Integer>>();
+		for (KeyValue<Integer, Integer> keyValue : all) {
+			Integer key = keyValue.getKey();
+			if (map.containsKey(key)) {
+				List<Integer> list = map.get(key);
+				list.add(keyValue.getValue());
+			} else {
+				List<Integer> list = new ArrayList<Integer>();
+				list.add(keyValue.getValue());
+				map.put(key, list);
+			}
+		}
+		return map;
+	}
+
 	@Transactional(rollbackFor = Exception.class)
 	public Turnover takeOrders(int turnoverId, List<Order> orders, boolean isPrint) throws Exception {
 		if (CollectionUtils.isEmpty(orders)) {
 			throw new IllegalArgumentException("Check Failed: orders is empty.");
 		}
+
+		Map<Integer, List<Integer>> productGroup = getProductGroup();
 
 		Turnover turnover = new Turnover();
 		turnover.setId(turnoverId);
@@ -230,6 +260,19 @@ public class CustomerManager {
 				o.setTurnover(turnover);
 				o.setModified(0);
 				orderMapper.insert(o);
+
+				int productId = o.getProduct().getId();
+				if (productGroup.containsKey(productId)) {
+					List<Integer> list = productGroup.get(productId);
+					OrderProductGroup opg = new OrderProductGroup();
+					for (Integer id : list) {
+						opg.setOrder(o);
+						Product p = new Product();
+						p.setId(id);
+						opg.setProduct(p);
+						orderProductGroupMapper.insert(opg);
+					}
+				}
 
 				List<OrderAttribution> orderAttributions = o.getOrderAttributions();
 				if (CollectionUtils.isNotEmpty(orderAttributions)) {
@@ -249,6 +292,7 @@ public class CustomerManager {
 				// Modified: 0:未修改数量；1：加菜；2：减菜；3：消菜
 				if (count == 0) {
 					orderMapper.delete(orderCopy);
+					orderProductGroupMapper.deleteByOrderId(orderCopy);
 					o.setOrderAttributions(null);
 					o.setModified(3);
 				} else {
@@ -292,18 +336,30 @@ public class CustomerManager {
 
 	public List<Order> getOrders(Order order) {
 		List<Order> orders = orderMapper.selectOrdersByTurnover(order);
-		fillOrderAttribution(order.getLocale(), orders);
+		fillOrderAttribution(order.getLocale(), orders.toArray(new Order[0]));
 		return orders;
 	}
 
 	public List<Order> getExtOrders(Order order) {
 		List<Order> orders = orderMapper.selectExtOrdersByTurnover(order);
-		fillOrderAttribution(order.getLocale(), orders);
+		fillOrderAttribution(order.getLocale(), orders.toArray(new Order[0]));
 		return orders;
 	}
 
-	private void fillOrderAttribution(String locale, List<Order> orders) {
-		if (CollectionUtils.isEmpty(orders)) {
+	private void fillOrderAttribution(String locale, OrderProductGroup[] groups) {
+		if (ArrayUtils.isEmpty(groups)) {
+			return;
+		}
+		List<Order> orders = new ArrayList<Order>();
+		for (OrderProductGroup one : groups) {
+			Order order = one.getOrder();
+			orders.add(order);
+		}
+		fillOrderAttribution(locale, orders.toArray(new Order[0]));
+	}
+
+	private void fillOrderAttribution(String locale, Order[] orders) {
+		if (ArrayUtils.isEmpty(orders)) {
 			return;
 		}
 		Map<Integer, Order> map = new HashMap<Integer, Order>();
@@ -335,7 +391,7 @@ public class CustomerManager {
 		}
 		List<Order> orders = orderMapper.selectOrdersByDate(param);
 
-		fillOrderAttribution(locale, orders);
+		fillOrderAttribution(locale, orders.toArray(new Order[0]));
 		fillTurnoverAttribution(orders);
 
 		Map<String, Object> map = ledgerTemplete.buildParam(null, orders, null, null);
@@ -536,43 +592,41 @@ public class CustomerManager {
 		params.put("ids", ids);
 		params.put("locale", locale);
 		List<Order> ordersWithInfo = orderMapper.selectOrders(params);
-		fillOrderAttribution(locale, ordersWithInfo);
+		fillOrderAttribution(locale, ordersWithInfo.toArray(new Order[0]));
 		return ordersWithInfo;
 	}
 
-	// synchronized private void print(byte[] img, int times) throws Exception {
-	// printer.print(img, times);
-	// }
 	@Transactional(rollbackFor = Exception.class)
 	public void clear() {
 		orderAttributionMapper.deleteAll();
+		orderProductGroupMapper.deleteAll();
 		orderMapper.deleteAll();
 		turnoverMapper.deleteAll();
 		turnoverAttributeMapper.deleteAll();
 		takeawayMapper.deleteAll();
 	}
 
-	public List<Order> selectColdDishes() {
-		List<Order> list = kitchenOrderMapper.selectColdDishes();
-		fillOrderAttribution(kitchenLocale, list);
+	public List<OrderProductGroup> selectColdDishes() {
+		List<OrderProductGroup> list = kitchenOrderMapper.selectColdDishes();
+		fillOrderAttribution(kitchenLocale, list.toArray(new OrderProductGroup[0]));
 		return list;
 	}
 
-	public List<Order> selectHotDishes() {
-		List<Order> list = kitchenOrderMapper.selectHotDishes();
-		fillOrderAttribution(kitchenLocale, list);
+	public List<OrderProductGroup> selectHotDishes() {
+		List<OrderProductGroup> list = kitchenOrderMapper.selectHotDishes();
+		fillOrderAttribution(kitchenLocale, list.toArray(new OrderProductGroup[0]));
 		return list;
 	}
 
-	public List<Order> selectCombos() {
-		List<Order> list = kitchenOrderMapper.selectCombos();
-		fillOrderAttribution(kitchenLocale, list);
-		return list;
-	}
+	// public List<Order> selectCombos() {
+	// List<Order> list = kitchenOrderMapper.selectCombos();
+	// fillOrderAttribution(kitchenLocale, list);
+	// return list;
+	// }
 
-	public List<Order> selectServedDishes() {
-		List<Order> list = kitchenOrderMapper.selectServedDishes();
-		fillOrderAttribution(kitchenLocale, list);
+	public List<OrderProductGroup> selectServedDishes() {
+		List<OrderProductGroup> list = kitchenOrderMapper.selectServedDishes();
+		fillOrderAttribution(kitchenLocale, list.toArray(new OrderProductGroup[0]));
 		return list;
 	}
 
@@ -583,14 +637,40 @@ public class CustomerManager {
 		o = orderMapper.select(o);
 		o.setStatus(o.getStatus() + 1);
 		orderMapper.update(o);
+
+		orderProductGroupMapper.reminder(o);
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	public void serveOrder(int id, int status) {
+	public void serveOrder(int id, int productId, int status) {
+		OrderProductGroup opg = new OrderProductGroup();
 		Order o = new Order();
 		o.setId(id);
-		o.setStatus(status);
-		orderMapper.update(o);
+		opg.setOrder(o);
+		Product p = new Product();
+		p.setId(productId);
+		opg.setProduct(p);
+		opg.setStatus(status);
+		orderProductGroupMapper.update(opg);
+
+		List<OrderProductGroup> groups = orderProductGroupMapper.selectByOrderId(o);
+		int orderStatus = 0;
+		for (OrderProductGroup orderProductGroup : groups) {
+			orderStatus += orderProductGroup.getStatus();
+		}
+
+		o = orderMapper.select(o);
+		if (orderStatus == 0) {
+			if (o.getStatus() != 0) {
+				o.setStatus(0);
+				orderMapper.update(o);
+			}
+		} else {
+			if (o.getStatus() == 0) {
+				o.setStatus(1);
+				orderMapper.update(o);
+			}
+		}
 	}
 
 	@Transactional(rollbackFor = Exception.class)

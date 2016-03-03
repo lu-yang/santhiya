@@ -30,6 +30,7 @@ import com.betalife.sushibuffet.exchange.DodoroException;
 import com.betalife.sushibuffet.exchange.ListExchange;
 import com.betalife.sushibuffet.exchange.MapExchange;
 import com.betalife.sushibuffet.exchange.OrderListExchange;
+import com.betalife.sushibuffet.exchange.OrderProductGroupListExchange;
 import com.betalife.sushibuffet.exchange.ProductListExchange;
 import com.betalife.sushibuffet.exchange.TakeawayExchange;
 import com.betalife.sushibuffet.exchange.TurnoverExchange;
@@ -37,6 +38,7 @@ import com.betalife.sushibuffet.manager.CustomerManager;
 import com.betalife.sushibuffet.model.Category;
 import com.betalife.sushibuffet.model.Diningtable;
 import com.betalife.sushibuffet.model.Order;
+import com.betalife.sushibuffet.model.OrderProductGroup;
 import com.betalife.sushibuffet.model.Product;
 import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Turnover;
@@ -370,34 +372,35 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "kitchen/cold/orders", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody OrderListExchange getColddish() {
-		List<Order> list = customerManager.selectColdDishes();
-		OrderListExchange exchange = new OrderListExchange();
-		exchange.setList(list.toArray(new Order[0]));
+	public @ResponseBody OrderProductGroupListExchange getColddish() {
+		List<OrderProductGroup> list = customerManager.selectColdDishes();
+		OrderProductGroupListExchange exchange = new OrderProductGroupListExchange();
+		exchange.setList(list.toArray(new OrderProductGroup[0]));
 		return exchange;
 	}
 
 	@RequestMapping(value = "kitchen/hot/orders", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody OrderListExchange getHotdish() {
-		List<Order> list = customerManager.selectHotDishes();
-		OrderListExchange exchange = new OrderListExchange();
-		exchange.setList(list.toArray(new Order[0]));
+	public @ResponseBody OrderProductGroupListExchange getHotdish() {
+		List<OrderProductGroup> list = customerManager.selectHotDishes();
+		OrderProductGroupListExchange exchange = new OrderProductGroupListExchange();
+		exchange.setList(list.toArray(new OrderProductGroup[0]));
 		return exchange;
 	}
 
-	@RequestMapping(value = "kitchen/combo/orders", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody OrderListExchange getCombo() {
-		List<Order> list = customerManager.selectCombos();
-		OrderListExchange exchange = new OrderListExchange();
-		exchange.setList(list.toArray(new Order[0]));
-		return exchange;
-	}
+	// @RequestMapping(value = "kitchen/combo/orders", method =
+	// RequestMethod.GET, produces = "application/json")
+	// public @ResponseBody OrderListExchange getCombo() {
+	// List<Order> list = customerManager.selectCombos();
+	// OrderListExchange exchange = new OrderListExchange();
+	// exchange.setList(list.toArray(new Order[0]));
+	// return exchange;
+	// }
 
 	@RequestMapping(value = "kitchen/served/orders", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody OrderListExchange getServeddish() {
-		List<Order> list = customerManager.selectServedDishes();
-		OrderListExchange exchange = new OrderListExchange();
-		exchange.setList(list.toArray(new Order[0]));
+	public @ResponseBody OrderProductGroupListExchange getServeddish() {
+		List<OrderProductGroup> list = customerManager.selectServedDishes();
+		OrderProductGroupListExchange exchange = new OrderProductGroupListExchange();
+		exchange.setList(list.toArray(new OrderProductGroup[0]));
 		return exchange;
 	}
 
@@ -409,40 +412,46 @@ public class HomeController {
 		return exchange;
 	}
 
-	@RequestMapping(value = "order/serve/hot/{id}", method = RequestMethod.PUT, produces = "application/json")
-	public @ResponseBody OrderListExchange serveHotOrder(@PathVariable int id) {
-		customerManager.serveOrder(id, 0);
+	@RequestMapping(value = "order/serve/hot/{orderId}/{productId}", method = RequestMethod.PUT, produces = "application/json")
+	public @ResponseBody OrderProductGroupListExchange serveHotOrder(@PathVariable int orderId,
+			@PathVariable int productId) {
+		customerManager.serveOrder(orderId, productId, 0);
 		return getHotdish();
 	}
 
-	@RequestMapping(value = "order/serve/cold/{id}", method = RequestMethod.PUT, produces = "application/json")
-	public @ResponseBody OrderListExchange serveColdOrder(@PathVariable int id) {
-		customerManager.serveOrder(id, 0);
+	@RequestMapping(value = "order/serve/cold/{orderId}/{productId}", method = RequestMethod.PUT, produces = "application/json")
+	public @ResponseBody OrderProductGroupListExchange serveColdOrder(@PathVariable int orderId,
+			@PathVariable int productId) {
+		customerManager.serveOrder(orderId, productId, 0);
 		return getColddish();
 	}
 
-	@RequestMapping(value = "order/serve/combo/{id}", method = RequestMethod.PUT, produces = "application/json")
-	public @ResponseBody OrderListExchange serveComboOrder(@PathVariable int id) {
-		customerManager.serveOrder(id, 0);
-		return getCombo();
-	}
+	// @RequestMapping(value = "order/serve/combo/{orderId}/{productId}", method
+	// = RequestMethod.PUT, produces = "application/json")
+	// public @ResponseBody OrderListExchange serveComboOrder(@PathVariable int
+	// orderId,
+	// @PathVariable int productId) {
+	// customerManager.serveOrder(orderId, productId, 0);
+	// return getCombo();
+	// }
 
-	@RequestMapping(value = "order/revert/{id}", method = RequestMethod.PUT, produces = "application/json")
-	public @ResponseBody Map<String, Object> revertOrder(@PathVariable int id) {
-		customerManager.serveOrder(id, 1);
+	@RequestMapping(value = "order/revert/{orderId}/{productId}", method = RequestMethod.PUT, produces = "application/json")
+	public @ResponseBody Map<String, Object> revertOrder(@PathVariable int orderId,
+			@PathVariable int productId) {
+		customerManager.serveOrder(orderId, productId, 1);
 		return dashboard();
 	}
 
 	@RequestMapping(value = "kitchen/dashboard/", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody Map<String, Object> dashboard() {
-		List<Order> coldDishes = customerManager.selectColdDishes();
-		List<Order> hotDishes = customerManager.selectHotDishes();
-		List<Order> servedDishes = customerManager.selectServedDishes();
-		List<Order> combos = customerManager.selectCombos();
+		List<OrderProductGroup> coldDishes = customerManager.selectColdDishes();
+		List<OrderProductGroup> hotDishes = customerManager.selectHotDishes();
+		List<OrderProductGroup> servedDishes = customerManager.selectServedDishes();
+		// List<Order> combos = customerManager.selectCombos();
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("coldDishes", coldDishes);
 		map.put("hotDishes", hotDishes);
-		map.put("combos", combos);
+		// map.put("combos", combos);
 		map.put("servedDishes", servedDishes);
 		return map;
 	}

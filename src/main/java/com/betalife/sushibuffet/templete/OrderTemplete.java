@@ -103,8 +103,8 @@ public class OrderTemplete extends ContentTemplete {
 
 			list.add(one);
 
-			String barName = category.getBarName();
-			// String barName = product.getBarName();
+			// String barName = category.getBarName();
+			String barName = product.getBarName();
 			if (StringUtils.isEmpty(barName)) {
 				barName = "empty";
 			}
