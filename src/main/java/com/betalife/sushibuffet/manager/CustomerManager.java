@@ -524,6 +524,7 @@ public class CustomerManager {
 		return takeawayMapper.select(t);
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	public void printKitchenOrders(List<Order> orders, Turnover turnover) throws Exception {
 		List<Order> list = new ArrayList<Order>();
 		for (Order order : orders) {
