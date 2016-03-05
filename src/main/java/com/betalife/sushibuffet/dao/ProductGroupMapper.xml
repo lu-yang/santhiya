@@ -10,7 +10,7 @@
 		<result property="value" column="member_product_id" />
 	</resultMap>  
 	
-	<select id="selectAll" resultType="productGroupMap">
+	<select id="selectAll" resultMap="productGroupMap">
 		<!-- http://www.iteye.com/problems/80072 -->
 		SELECT
 			product_id, member_product_id
