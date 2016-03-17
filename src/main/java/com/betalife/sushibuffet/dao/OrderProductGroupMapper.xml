@@ -10,7 +10,7 @@
 		FROM
 			`orderproductgroup`
 		WHERE 
-			order_id = #{order.id}
+			order_id = #{id}
 	</select>
 	
 	<insert id="insert" parameterType="OrderProductGroup">
@@ -32,7 +32,7 @@
 		, served = null
 		</if>
 		, status = #{status}
-		WHERE order_id = #{order.id} 
+		WHERE order_id = #{id} 
 		AND product_id = #{product.id}
 	</update>
 	
@@ -48,7 +48,7 @@
 	
 	<delete id="deleteByOrderId" parameterType="Order">
 		DELETE FROM `orderproductgroup`
-		WHERE order_id=#{order.id}
+		WHERE order_id=#{id}
 	</delete>
 
 	<delete id="deleteAll">
