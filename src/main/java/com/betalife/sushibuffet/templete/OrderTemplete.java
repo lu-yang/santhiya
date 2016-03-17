@@ -115,7 +115,9 @@ public class OrderTemplete extends ContentTemplete {
 					List<Map<String, Object>> values = barNameMap.get(bn);
 					values.addAll(list);
 				} else {
-					barNameMap.put(bn, list);
+					List<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
+					values.addAll(list);
+					barNameMap.put(bn, values);
 				}
 			}
 		}
