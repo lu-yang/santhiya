@@ -7,7 +7,7 @@
 
 	<select id="selectByParentId" parameterType="Category" resultType="Category" useCache="false">
 		SELECT
-			c.id, c.active, c.position, c.thumb, m.name, m.desc as description
+			c.id, c.active, c.position, c.thumb, m.name, m.desc as description, c.online
 		FROM
 			category c LEFT JOIN multilang m ON m.id = CONCAT('c',c.id)  AND m.locale=#{locale}
 		WHERE 

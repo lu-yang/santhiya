@@ -8,7 +8,7 @@
 	<select id="selectByCategoryId" parameterType="Product" resultType="Product" useCache="false">
 		SELECT
 			p.id, p.category_id, p.product_price, p.active, p.position,  p.thumb, p.num, p.product_num, p.bar_name,
-			m.name as productName, m.desc as description
+			m.name as productName, m.desc as description, p.online
 		FROM
 			product p LEFT JOIN multilang m 
 				ON m.id = CONCAT('p', p.id) AND m.locale= #{locale}

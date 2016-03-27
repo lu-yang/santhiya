@@ -16,6 +16,15 @@ public class Category extends BaseModel {
 	private String locale;
 	private String barName;
 	private int type;
+	private int online;
+
+	public int getOnline() {
+		return online;
+	}
+
+	public void setOnline(int online) {
+		this.online = online;
+	}
 
 	public int getType() {
 		return type;

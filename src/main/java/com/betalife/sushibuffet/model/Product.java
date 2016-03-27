@@ -20,11 +20,20 @@ public class Product extends BaseModel {
 	private int taxgroupId;
 	private int productPrice;
 	private String locale;
+	private int online;
 
 	private List<AttributionGroup> attributionGroups;
 
 	private String barName;
 	private int type;
+
+	public int getOnline() {
+		return online;
+	}
+
+	public void setOnline(int online) {
+		this.online = online;
+	}
 
 	public int getType() {
 		return type;
