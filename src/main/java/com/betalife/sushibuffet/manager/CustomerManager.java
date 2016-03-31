@@ -1,5 +1,6 @@
 package com.betalife.sushibuffet.manager;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,10 +43,12 @@ import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Turnover;
 import com.betalife.sushibuffet.model.TurnoverAttribute;
 import com.betalife.sushibuffet.model.TurnoverExt;
+import com.betalife.sushibuffet.model.WebOrder;
 import com.betalife.sushibuffet.print.PrintManager;
 import com.betalife.sushibuffet.templete.LedgerTemplete;
 import com.betalife.sushibuffet.util.Constant;
 import com.betalife.sushibuffet.util.DodoroUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class CustomerManager {
@@ -104,12 +108,13 @@ public class CustomerManager {
 	@Autowired
 	private PrintManager printManager;
 
+	private ObjectMapper mapper = new ObjectMapper();
+
 	@Transactional(rollbackFor = Exception.class)
 	public Turnover openTable(Turnover turnover) {
 		Integer tableId = turnover.getTableId();
 		List<Diningtable> tables = tableMapper.selectTables(tableId);
-		if (CollectionUtils.isEmpty(tables) || tables.get(0).getTurnover() == null
-				|| tables.get(0).getTurnover().isCheckout()) {
+		if (CollectionUtils.isEmpty(tables) || tables.get(0).getTurnover() == null || tables.get(0).getTurnover().isCheckout()) {
 			turnover.setFirstTableId(tableId);
 			turnoverMapper.insert(turnover);
 			return turnoverMapper.select(turnover);
@@ -381,8 +386,7 @@ public class CustomerManager {
 		}
 	}
 
-	public Map<String, Object> ledger(Date from, Date to, boolean isPrint, List<TurnoverAttribute> attributes)
-			throws Exception {
+	public Map<String, Object> ledger(Date from, Date to, boolean isPrint, List<TurnoverAttribute> attributes) throws Exception {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("from", from);
 		param.put("to", to);
@@ -479,14 +483,15 @@ public class CustomerManager {
 	@Transactional(rollbackFor = Exception.class)
 	public void add(Takeaway takeaway) {
 		takeawayMapper.insert(takeaway);
-
-		Turnover turnover = new Turnover();
+		Turnover turnover = takeaway.getTurnover();
+		if (turnover == null) {
+			turnover = new Turnover();
+			takeaway.setTurnover(turnover);
+		}
 		turnover.setTakeawayId(takeaway.getId());
 		turnover.setTableId(0);
 		turnover.setFirstTableId(0);
 		turnoverMapper.insert(turnover);
-
-		takeaway.setTurnover(turnover);
 	}
 
 	@Transactional(rollbackFor = Exception.class)
@@ -689,6 +694,18 @@ public class CustomerManager {
 			turnoverAttributeMapper.insert(t);
 		}
 
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public void addWebOrders(File file, String moveTo) throws Exception {
+		WebOrder webOrder = mapper.readValue(file, WebOrder.class);
+		Takeaway takeaway = webOrder.getTakeaway();
+		takeaway.setTakeaway(false);
+		takeaway.setVaild(false);
+		add(takeaway);
+		takeOrders(takeaway.getTurnover().getId(), webOrder.getOrders(), takeaway.isPrinted());
+
+		FileUtils.moveToDirectory(file, new File(moveTo), true);
 	}
 
 }

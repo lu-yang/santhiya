@@ -6,6 +6,7 @@
 	xmlns:aop="http://www.springframework.org/schema/aop" 
 	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:task="http://www.springframework.org/schema/task"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
 							http://www.springframework.org/schema/beans/spring-beans.xsd
 							http://www.springframework.org/schema/context  
@@ -17,7 +18,9 @@
          					http://www.springframework.org/schema/util 
          					http://www.springframework.org/schema/util/spring-util.xsd
          					http://www.springframework.org/schema/mvc     
-    						http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    						http://www.springframework.org/schema/mvc/spring-mvc.xsd
+    						http://www.springframework.org/schema/task 
+         					http://www.springframework.org/schema/task/spring-task.xsd">
 	
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
@@ -38,6 +41,9 @@
 	
 	<util:properties id="printers" location="classpath:printers.properties" />
 	
+	
+	<bean class="java.util.concurrent.ConcurrentLinkedQueue" id="webOrderQueue"/>
+	
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
@@ -47,6 +53,10 @@
 	<bean class="com.betalife.sushibuffet.print.PrinterAdapter" id="printer" scope="prototype">
 	    <property name="logo"  value="${receipt.logo}" />
 	</bean>
+	
+	<task:annotation-driven/>
+	<task:scheduler id="scheduler" pool-size="10"/>
+	
 	
 	<mvc:annotation-driven>
 		<mvc:message-converters>

@@ -6,13 +6,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -29,12 +26,12 @@ import com.betalife.sushibuffet.templete.ReceiptTemplete;
 
 @Service
 public class PrintManager implements ApplicationContextAware {
-	private static final Logger logger = LoggerFactory.getLogger(PrintManager.class);
 
 	@Value("${print.times}")
 	private int times;
 
-	@Resource(name = "printers")
+	@Autowired
+	@Qualifier("printers")
 	private Properties printers;
 
 	@Autowired
