@@ -18,6 +18,15 @@ public class Takeaway extends BaseModel {
 	private Turnover turnover;
 	// @JsonFormat(pattern = "yyyy/MM/dd hh:mm:ss")
 	private Date deliveryTimestamp;
+	private Integer deliveryPayment;
+
+	public Integer getDeliveryPayment() {
+		return deliveryPayment;
+	}
+
+	public void setDeliveryPayment(Integer deliveryPayment) {
+		this.deliveryPayment = deliveryPayment;
+	}
 
 	public Date getDeliveryTimestamp() {
 		return deliveryTimestamp;

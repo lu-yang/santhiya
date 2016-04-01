@@ -14,6 +14,7 @@
 		<result property="printed" column="printed" />
 		<result property="source" column="source" />
 		<result property="delivery" column="delivery" />
+		<result property="deliveryPayment" column="delivery_payment" />
 		<result property="deliveryTimestamp" column="delivery_timestamp" />
 		<association property="turnover" javaType="Turnover">
 			<id property="id" column="turnover_id" />
@@ -30,8 +31,8 @@
 
 	<insert id="insert" parameterType="Takeaway" useGeneratedKeys="true"
 		keyProperty="id">
-		INSERT INTO takeaway (memo, takeaway, vaild, printed, source, delivery, delivery_timestamp)
-		VALUES (#{memo}, #{takeaway}, #{vaild}, #{printed}, #{source}, #{delivery}, #{deliveryTimestamp})
+		INSERT INTO takeaway (memo, takeaway, vaild, printed, source, delivery, delivery_timestamp, delivery_payment)
+		VALUES (#{memo}, #{takeaway}, #{vaild}, #{printed}, #{source}, #{delivery}, #{deliveryTimestamp}, #{deliveryPayment})
 	</insert>
 
 	<update id="update" parameterType="Takeaway">
@@ -58,6 +59,9 @@
 		<if test="deliveryTimestamp != null">
 			delivery_timestamp=#{deliveryTimestamp},
 		</if>
+		<if test="deliveryPayment != null">
+			delivery_payment=#{deliveryPayment},
+		</if>
 		updated=now()
 		WHERE id=#{id}
 	</update>
@@ -65,7 +69,7 @@
 	<select id="selectAll" resultMap="takeawayExtResult">
 		SELECT 
 			tor.id as turnover_id, tor.checkout, tor.takeaway_id, tor.discount, tor.payment,
-			ta.created,ta.memo,ta.takeaway,ta.id, ta.vaild, ta.printed, ta.source, ta.delivery, ta.delivery_timestamp, ta.updated 
+			ta.created,ta.memo,ta.takeaway,ta.id, ta.vaild, ta.printed, ta.source, ta.delivery, ta.delivery_timestamp, ta.updated, ta.delivery_payment
 		FROM
 			takeaway ta, turnover tor
 		WHERE ta.id=tor.takeaway_id 
@@ -75,7 +79,7 @@
 	<select id="select" parameterType="Takeaway" resultType="Takeaway">
 		SELECT
 		tor.id as turnover_id, tor.checkout, tor.takeaway_id, tor.discount, tor.payment,
-		ta.created,ta.memo,ta.takeaway,ta.id, ta.vaild, ta.printed, ta.source, ta.delivery, ta.delivery_timestamp, ta.updated 
+		ta.created,ta.memo,ta.takeaway,ta.id, ta.vaild, ta.printed, ta.source, ta.delivery, ta.delivery_timestamp, ta.updated, ta.delivery_payment 
 		FROM
 		takeaway ta, turnover tor
 		WHERE ta.id=tor.takeaway_id

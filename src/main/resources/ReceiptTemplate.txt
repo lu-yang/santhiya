@@ -9,6 +9,7 @@
 <#else>
 \u001b|bC\u001b|rAEmporter No.: ${takeawayNo}\n
 \u001b|bC\u001b|rARemarque: ${memo}\n
+\u001b|bC\u001b|rAPayment: ${deliveryPayment}\n
 </#if>
 \u001b|bC\u001b|rAOrder time: ${date}\n
 

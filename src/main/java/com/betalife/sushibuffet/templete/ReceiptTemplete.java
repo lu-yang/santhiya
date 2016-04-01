@@ -32,8 +32,7 @@ public class ReceiptTemplete extends ContentTemplete {
 		this.templateFile = templateFile;
 	}
 
-	public Map<String, Object> buildParam(Turnover turnover, List<Order> orders, String locale,
-			Takeaway takeaway) {
+	public Map<String, Object> buildParam(Turnover turnover, List<Order> orders, String locale, Takeaway takeaway) {
 
 		Map<Integer, Category> categoryMap = getCategoryMap(locale);
 		Map<Integer, Product> productMap = getProductMap(locale);
@@ -46,6 +45,7 @@ public class ReceiptTemplete extends ContentTemplete {
 			Integer takeawayId = turnover.getTakeawayId();
 			map.put("takeawayNo", takeawayId);
 			map.put("memo", takeaway.getMemo());
+			map.put("deliveryPayment", takeaway.getDeliveryPayment());
 		} else {
 			int tableId = orders.get(0).getTurnover().getTableId();
 			map.put("tableNo", tableId);
@@ -115,13 +115,11 @@ public class ReceiptTemplete extends ContentTemplete {
 		if (isTakeaway) {
 			putTotal(foodTax.getTakeaway(), FOOD, getKindTotal(kindTotalMap, foodTax.getId() + ""), map);
 
-			putTotal(alcoholTax.getTakeaway(), ALCOHOL, getKindTotal(kindTotalMap, alcoholTax.getId() + ""),
-					map);
+			putTotal(alcoholTax.getTakeaway(), ALCOHOL, getKindTotal(kindTotalMap, alcoholTax.getId() + ""), map);
 		} else {
 			putTotal(foodTax.getValue(), FOOD, getKindTotal(kindTotalMap, foodTax.getId() + ""), map);
 
-			putTotal(alcoholTax.getValue(), ALCOHOL, getKindTotal(kindTotalMap, alcoholTax.getId() + ""),
-					map);
+			putTotal(alcoholTax.getValue(), ALCOHOL, getKindTotal(kindTotalMap, alcoholTax.getId() + ""), map);
 		}
 
 		Integer percent = turnover.getDiscount();
