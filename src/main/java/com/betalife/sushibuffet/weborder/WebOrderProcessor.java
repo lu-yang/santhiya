@@ -47,6 +47,7 @@ public class WebOrderProcessor {
 				try {
 					customerManager.addWebOrders(file, moveTo);
 				} catch (Exception e) {
+					log.debug(e);
 					log.error("web order file can't be processed: " + file.getAbsolutePath() + ".");
 				}
 			}
