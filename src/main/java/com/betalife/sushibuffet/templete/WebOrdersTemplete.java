@@ -10,11 +10,10 @@ import org.springframework.stereotype.Component;
 import com.betalife.sushibuffet.model.Order;
 import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Turnover;
-import com.betalife.sushibuffet.util.DodoroUtil;
 
 @Component
-public class ReceiptTemplete extends AReceiptTemplete {
-	@Value("${receipt.template}")
+public class WebOrdersTemplete extends AReceiptTemplete {
+	@Value("${weborders.template}")
 	@Override
 	protected void setTemplateFile(String templateFile) {
 		this.templateFile = templateFile;
@@ -25,17 +24,11 @@ public class ReceiptTemplete extends AReceiptTemplete {
 		Map<String, Object> map = super.buildParam(turnover, orders, locale, takeaway);
 		map.put("date", sdf.format(new Date()));
 
-		boolean isTakeaway = DodoroUtil.isTakeaway(turnover);
-		if (isTakeaway) {
-			Integer takeawayId = turnover.getTakeawayId();
-			map.put("takeawayNo", takeawayId);
-			map.put("memo", takeaway.getMemo());
-			map.put("deliveryPayment", takeaway.getDeliveryPayment());
-			map.put("source", takeaway.getSource());
-		} else {
-			int tableId = turnover.getTableId();
-			map.put("tableNo", tableId);
-		}
+		Integer takeawayId = turnover.getTakeawayId();
+		map.put("takeawayNo", takeawayId);
+		map.put("memo", takeaway.getMemo());
+		map.put("deliveryPayment", takeaway.getDeliveryPayment());
+		map.put("deliveryTimestamp", takeaway.getDeliveryTimestamp());
 
 		return map;
 	}

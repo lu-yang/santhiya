@@ -67,8 +67,7 @@ public class HomeController {
 	// parentId：1；categoryName：炒菜，categoryId：3， parentId：1；
 	// 参数parentId=1，结果是炖菜和炒菜
 	@RequestMapping(value = "categories/{locale}/{parentId}", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody CategoryListExchange fetchRootCategories(@PathVariable String locale,
-			@PathVariable int parentId) {
+	public @ResponseBody CategoryListExchange fetchRootCategories(@PathVariable String locale, @PathVariable int parentId) {
 		Category model = new Category();
 		model.setParentId(parentId);
 		model.setLocale(locale);
@@ -101,8 +100,7 @@ public class HomeController {
 
 	// 取指定分类的菜品（取所有categoryId等于{categoryId}的菜品）。
 	@RequestMapping(value = "products/{locale}/{categoryId}", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody ProductListExchange fetchProductsByCategoryId(@PathVariable String locale,
-			@PathVariable int categoryId) {
+	public @ResponseBody ProductListExchange fetchProductsByCategoryId(@PathVariable String locale, @PathVariable int categoryId) {
 		Product model = new Product();
 		model.setCategoryId(categoryId);
 		model.setLocale(locale);
@@ -115,8 +113,8 @@ public class HomeController {
 
 	// 点菜。order的count表示增加量，例如：增加2个时，count是2，减少2个时，count是-2
 	@RequestMapping(value = "orders/{turnoverId}/{isPrint}", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
-	public @ResponseBody TurnoverExchange takeOrders(@RequestBody List<Order> orders,
-			@PathVariable int turnoverId, @PathVariable boolean isPrint) throws Exception {
+	public @ResponseBody TurnoverExchange takeOrders(@RequestBody List<Order> orders, @PathVariable int turnoverId, @PathVariable boolean isPrint)
+			throws Exception {
 		Turnover turnover = customerManager.takeOrders(turnoverId, orders, isPrint);
 		TurnoverExchange exchange = new TurnoverExchange();
 		exchange.setModel(turnover);
@@ -136,8 +134,7 @@ public class HomeController {
 
 	// 取所有turnoverId等于{turnoverId}的点单记录。
 	@RequestMapping(value = "extOrders/{locale}/{turnoverId}", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody OrderListExchange extOrders(@PathVariable String locale,
-			@PathVariable int turnoverId) {
+	public @ResponseBody OrderListExchange extOrders(@PathVariable String locale, @PathVariable int turnoverId) {
 		Order model = buildOrder(locale, turnoverId);
 		List<Order> all = customerManager.getExtOrders(model);
 
@@ -159,13 +156,13 @@ public class HomeController {
 		Order model = buildOrder(locale, turnoverId);
 		List<Order> orders = customerManager.getOrders(model);
 		if (CollectionUtils.isEmpty(orders)) {
-			logger.info("there is no order to print." + model);
+			logger.info("there is no order to print.[turnoveId:" + turnoverId + "]");
 		}
 		Turnover turnover = customerManager.get(model.getTurnover());
 		if (kitchen) {
-			customerManager.printKitchenOrders(orders, turnover);
+			customerManager.printOrders(orders, turnover);
 		} else {
-			customerManager.printOrders(orders, turnover, locale);
+			customerManager.printReceipt(orders, turnover, locale);
 		}
 		BooleanExchange exchange = new BooleanExchange();
 		exchange.setModel(true);
@@ -174,22 +171,19 @@ public class HomeController {
 
 	// 打印所有turnoverId等于{turnoverId}的点单记录（厨房）
 	@RequestMapping(value = "printKitchenOrders/{locale}/{turnoverId}", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody BooleanExchange printKitchenOrders(@PathVariable String locale,
-			@PathVariable int turnoverId) throws Exception {
+	public @ResponseBody BooleanExchange printKitchen(@PathVariable String locale, @PathVariable int turnoverId) throws Exception {
 		return printOrders(locale, turnoverId, true);
 	}
 
 	// 打印所有turnoverId等于{turnoverId}的点单记录（结帐单）
 	@RequestMapping(value = "printOrders/{locale}/{turnoverId}", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody BooleanExchange printOrders(@PathVariable String locale,
-			@PathVariable int turnoverId) throws Exception {
+	public @ResponseBody BooleanExchange printOrders(@PathVariable String locale, @PathVariable int turnoverId) throws Exception {
 		return printOrders(locale, turnoverId, false);
 	}
 
 	// 打印所有{orderId}的点单记录（厨房）
 	@RequestMapping(value = "printKitchenOrders", method = RequestMethod.POST, produces = "application/json")
-	public @ResponseBody BooleanExchange printKitchenOrders(@RequestBody List<Order> orders)
-			throws Exception {
+	public @ResponseBody BooleanExchange printKitchenOrders(@RequestBody List<Order> orders) throws Exception {
 		orders = customerManager.selectOrders(orders);
 		Map<Integer, Turnover> tmap = new HashMap<Integer, Turnover>();
 		Map<Integer, List<Order>> omap = new HashMap<Integer, List<Order>>();
@@ -207,7 +201,7 @@ public class HomeController {
 		for (Integer id : tmap.keySet()) {
 			Turnover turnover = tmap.get(id);
 			List<Order> list = omap.get(id);
-			customerManager.printKitchenOrders(list, turnover);
+			customerManager.printOrders(list, turnover);
 		}
 		BooleanExchange exchange = new BooleanExchange();
 		exchange.setModel(true);
@@ -254,8 +248,8 @@ public class HomeController {
 
 	// GET turnovers by type with total price. type: 1. 所有 2. 堂吃. 3. 外卖
 	@RequestMapping(value = "turnover/all/totalPrice/{type}/{from}/{to}", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody ListExchange<Map<String, Object>> getTurnoversWithTotalPrice(@PathVariable int type,
-			@PathVariable String from, @PathVariable String to) throws ParseException {
+	public @ResponseBody ListExchange<Map<String, Object>> getTurnoversWithTotalPrice(@PathVariable int type, @PathVariable String from,
+			@PathVariable String to) throws ParseException {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date fromDate = sdf.parse(from);
 		Date toDate = sdf.parse(to);
@@ -271,9 +265,8 @@ public class HomeController {
 
 	// 打印指定时间内的总单
 	@RequestMapping(value = "ledger/{from}/{to}/{isPrint}", method = RequestMethod.POST, produces = "application/json")
-	public @ResponseBody Map<String, Object> ledger(@PathVariable String from, @PathVariable String to,
-			@PathVariable boolean isPrint, @RequestBody(required = false) List<TurnoverAttribute> attributes)
-					throws Exception {
+	public @ResponseBody Map<String, Object> ledger(@PathVariable String from, @PathVariable String to, @PathVariable boolean isPrint,
+			@RequestBody(required = false) List<TurnoverAttribute> attributes) throws Exception {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date fromDate = sdf.parse(from);
 		Date toDate = sdf.parse(to);
@@ -300,8 +293,7 @@ public class HomeController {
 
 	// 取外卖记录（指定日期的）
 	@RequestMapping(value = "takeaways/{from}/{to}", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody ListExchange<Map<String, Object>> takeaways(@PathVariable String from,
-			@PathVariable String to) throws Exception {
+	public @ResponseBody ListExchange<Map<String, Object>> takeaways(@PathVariable String from, @PathVariable String to) throws Exception {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date fromDate = sdf.parse(from);
 		Date toDate = sdf.parse(to);
@@ -343,8 +335,7 @@ public class HomeController {
 	// 更新一个外卖，如果{checkout}是true，会更新{takeaway}所关联的{turnover}。
 	// {checkout}是true的时候，表示外卖结账，{takeaway}关联的{turnover}的{checkout}需要被更新成true
 	@RequestMapping(value = "takeaway/{checkout}", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
-	public @ResponseBody BooleanExchange updateTakeaway(@PathVariable boolean checkout,
-			@RequestBody Takeaway takeaway) {
+	public @ResponseBody BooleanExchange updateTakeaway(@PathVariable boolean checkout, @RequestBody Takeaway takeaway) {
 		customerManager.update(takeaway, checkout);
 		BooleanExchange exchange = new BooleanExchange();
 		exchange.setModel(true);
@@ -413,15 +404,13 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "order/serve/hot/{orderId}/{productId}", method = RequestMethod.PUT, produces = "application/json")
-	public @ResponseBody OrderProductGroupListExchange serveHotOrder(@PathVariable int orderId,
-			@PathVariable int productId) {
+	public @ResponseBody OrderProductGroupListExchange serveHotOrder(@PathVariable int orderId, @PathVariable int productId) {
 		customerManager.serveOrder(orderId, productId, 0);
 		return getHotdish();
 	}
 
 	@RequestMapping(value = "order/serve/cold/{orderId}/{productId}", method = RequestMethod.PUT, produces = "application/json")
-	public @ResponseBody OrderProductGroupListExchange serveColdOrder(@PathVariable int orderId,
-			@PathVariable int productId) {
+	public @ResponseBody OrderProductGroupListExchange serveColdOrder(@PathVariable int orderId, @PathVariable int productId) {
 		customerManager.serveOrder(orderId, productId, 0);
 		return getColddish();
 	}
@@ -436,8 +425,7 @@ public class HomeController {
 	// }
 
 	@RequestMapping(value = "order/revert/{orderId}/{productId}", method = RequestMethod.PUT, produces = "application/json")
-	public @ResponseBody Map<String, Object> revertOrder(@PathVariable int orderId,
-			@PathVariable int productId) {
+	public @ResponseBody Map<String, Object> revertOrder(@PathVariable int orderId, @PathVariable int productId) {
 		customerManager.serveOrder(orderId, productId, 1);
 		return dashboard();
 	}

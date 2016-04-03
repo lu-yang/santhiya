@@ -530,7 +530,7 @@ public class CustomerManager {
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	public void printKitchenOrders(List<Order> orders, Turnover turnover) throws Exception {
+	public void printOrders(List<Order> orders, Turnover turnover) throws Exception {
 		List<Order> list = new ArrayList<Order>();
 		for (Order order : orders) {
 			if (!order.getPrinted()) {
@@ -543,7 +543,18 @@ public class CustomerManager {
 		printManager.printOrders(turnover, orders, locale, false);
 	}
 
-	public void printOrders(List<Order> orders, Turnover turnover, String locale) throws Exception {
+	public void printReceipt(List<Order> orders, Turnover turnover, String locale) throws Exception {
+		Map<Integer, Order> map = mergeOrders(orders);
+		Takeaway takeaway = null;
+		if (DodoroUtil.isTakeaway(turnover)) {
+			takeaway = new Takeaway();
+			takeaway.setId(turnover.getTakeawayId());
+			takeaway = takeawayMapper.select(takeaway);
+		}
+		printManager.printReceipt(turnover, new ArrayList<Order>(map.values()), locale, true, takeaway);
+	}
+
+	private Map<Integer, Order> mergeOrders(List<Order> orders) {
 		// productId
 		Map<Integer, Order> map = new HashMap<Integer, Order>();
 		// productId-attId
@@ -578,13 +589,7 @@ public class CustomerManager {
 
 			}
 		}
-		Takeaway takeaway = null;
-		if (DodoroUtil.isTakeaway(turnover)) {
-			takeaway = new Takeaway();
-			takeaway.setId(turnover.getTakeawayId());
-			takeaway = takeawayMapper.select(takeaway);
-		}
-		printManager.printReceipt(turnover, new ArrayList<Order>(map.values()), locale, true, takeaway);
+		return map;
 	}
 
 	public List<Order> selectOrders(List<Order> orders) {
@@ -703,7 +708,20 @@ public class CustomerManager {
 		takeaway.setTakeaway(false);
 		takeaway.setVaild(false);
 		add(takeaway);
-		takeOrders(takeaway.getTurnover().getId(), webOrder.getOrders(), takeaway.isPrinted());
+		takeOrders(takeaway.getTurnover().getId(), webOrder.getOrders(), false);
+
+		Turnover turnover = takeaway.getTurnover();
+		Order model = new Order();
+		model.setLocale(locale);
+		model.setTurnover(turnover);
+		List<Order> orders = getOrders(model);
+		if (CollectionUtils.isEmpty(orders)) {
+			logger.info("there is no order to print.[turnoveId:" + turnover.getId() + "]");
+		}
+
+		Map<Integer, Order> map = mergeOrders(orders);
+
+		printManager.printReceipt(turnover, new ArrayList<Order>(map.values()), locale, true, takeaway);
 
 		FileUtils.moveToDirectory(file, new File(moveTo), true);
 	}
