@@ -23,6 +23,7 @@ import com.betalife.sushibuffet.templete.ContentTemplete;
 import com.betalife.sushibuffet.templete.LedgerTemplete;
 import com.betalife.sushibuffet.templete.OrderTemplete;
 import com.betalife.sushibuffet.templete.ReceiptTemplete;
+import com.betalife.sushibuffet.templete.WebOrdersTemplete;
 
 @Service
 public class PrintManager implements ApplicationContextAware {
@@ -39,14 +40,15 @@ public class PrintManager implements ApplicationContextAware {
 
 	@Autowired
 	private ReceiptTemplete receiptTemplete;
+	@Autowired
+	private WebOrdersTemplete webOrdersTemplete;
 
 	@Autowired
 	private LedgerTemplete ledgerTemplete;
 
 	private ApplicationContext applicationContext;
 
-	synchronized private void print(String barName, Object content, boolean logo, int times)
-			throws Exception {
+	synchronized private void print(String barName, Object content, boolean logo, int times) throws Exception {
 		Printer printer = getPrinter(barName);
 		if (printer == null) {
 			return;
@@ -78,13 +80,11 @@ public class PrintManager implements ApplicationContextAware {
 		this.applicationContext = applicationContext;
 	}
 
-	public void printOrders(Turnover turnover, List<Order> orders, String locale, boolean logo)
-			throws Exception {
+	public void printOrders(Turnover turnover, List<Order> orders, String locale, boolean logo) throws Exception {
 		if (CollectionUtils.isEmpty(orders)) {
 			return;
 		}
-		Map<String, Map<String, Object>> barnameParamMap = orderTemplete.buildBarnameParam(turnover, orders,
-				locale, null);
+		Map<String, Map<String, Object>> barnameParamMap = orderTemplete.buildBarnameParam(turnover, orders, locale, null);
 		print(barnameParamMap, logo, times, orderTemplete);
 	}
 
@@ -98,15 +98,22 @@ public class PrintManager implements ApplicationContextAware {
 	// print(barName, html, logo, times);
 	// }
 
-	public void printReceipt(Turnover turnover, List<Order> orders, String locale, boolean logo,
-			Takeaway takeaway) throws Exception {
+	public void printReceipt(Turnover turnover, List<Order> orders, String locale, boolean logo, Takeaway takeaway) throws Exception {
 		if (CollectionUtils.isEmpty(orders)) {
 			return;
 		}
 
-		Map<String, Map<String, Object>> barnameParamMap = receiptTemplete.buildBarnameParam(turnover, orders,
-				locale, takeaway);
+		Map<String, Map<String, Object>> barnameParamMap = receiptTemplete.buildBarnameParam(turnover, orders, locale, takeaway);
 		print(barnameParamMap, false, times, receiptTemplete);
+	}
+
+	public void printWebOrders(Turnover turnover, List<Order> orders, String locale, boolean logo, Takeaway takeaway) throws Exception {
+		if (CollectionUtils.isEmpty(orders)) {
+			return;
+		}
+
+		Map<String, Map<String, Object>> barnameParamMap = webOrdersTemplete.buildBarnameParam(turnover, orders, locale, takeaway);
+		print(barnameParamMap, false, times, webOrdersTemplete);
 	}
 
 	public void printLedger(List<Order> orders) throws Exception {
@@ -114,13 +121,11 @@ public class PrintManager implements ApplicationContextAware {
 			return;
 		}
 
-		Map<String, Map<String, Object>> barnameParamMap = ledgerTemplete.buildBarnameParam(null, orders,
-				null, null);
+		Map<String, Map<String, Object>> barnameParamMap = ledgerTemplete.buildBarnameParam(null, orders, null, null);
 		print(barnameParamMap, false, times, ledgerTemplete);
 	}
 
-	private void print(Map<String, Map<String, Object>> barnameParamMap, boolean logo, int times,
-			ContentTemplete contentTemplete) throws Exception {
+	private void print(Map<String, Map<String, Object>> barnameParamMap, boolean logo, int times, ContentTemplete contentTemplete) throws Exception {
 		Set<String> keySet = barnameParamMap.keySet();
 		for (String barName : keySet) {
 			Map<String, Object> map = barnameParamMap.get(barName);
