@@ -407,6 +407,9 @@ public class CustomerManager {
 	}
 
 	private void fillTurnoverAttribution(List<Order> orders) {
+		if (CollectionUtils.isEmpty(orders)) {
+			return;
+		}
 		Map<Integer, Turnover> turnoverMap = new HashMap<Integer, Turnover>();
 		Map<Integer, List<Order>> turnoverOrdersMap = new HashMap<Integer, List<Order>>();
 		for (Order order : orders) {
@@ -686,19 +689,24 @@ public class CustomerManager {
 
 	@Transactional(rollbackFor = Exception.class)
 	public void update(List<TurnoverAttribute> list) {
-		List<TurnoverAttribute> attributes = turnoverAttributeMapper.selectList(list);
+		if (CollectionUtils.isEmpty(list)) {
+			for (TurnoverAttribute t : list) {
+				turnoverAttributeMapper.insert(t);
+			}
+		} else {
+			List<TurnoverAttribute> attributes = turnoverAttributeMapper.selectList(list);
 
-		String[] idStrList = { "turnoverId", "attributeName" };
-		UpdateClassify updateClassify = new UpdateClassify(list, attributes, idStrList);
-		List<TurnoverAttribute> insertList = updateClassify.getInsertList();
-		List<TurnoverAttribute> updateList = updateClassify.getUpdateList();
-		for (TurnoverAttribute t : updateList) {
-			turnoverAttributeMapper.update(t);
+			String[] idStrList = { "turnoverId", "attributeName" };
+			UpdateClassify updateClassify = new UpdateClassify(list, attributes, idStrList);
+			List<TurnoverAttribute> insertList = updateClassify.getInsertList();
+			List<TurnoverAttribute> updateList = updateClassify.getUpdateList();
+			for (TurnoverAttribute t : updateList) {
+				turnoverAttributeMapper.update(t);
+			}
+			for (TurnoverAttribute t : insertList) {
+				turnoverAttributeMapper.insert(t);
+			}
 		}
-		for (TurnoverAttribute t : insertList) {
-			turnoverAttributeMapper.insert(t);
-		}
-
 	}
 
 	@Transactional(rollbackFor = Exception.class)
