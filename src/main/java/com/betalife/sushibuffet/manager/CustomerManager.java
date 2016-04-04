@@ -721,7 +721,7 @@ public class CustomerManager {
 
 		Map<Integer, Order> map = mergeOrders(orders);
 
-		printManager.printReceipt(turnover, new ArrayList<Order>(map.values()), locale, true, takeaway);
+		printManager.printWebOrders(turnover, new ArrayList<Order>(map.values()), locale, true, takeaway);
 
 		FileUtils.moveToDirectory(file, new File(moveTo), true);
 	}

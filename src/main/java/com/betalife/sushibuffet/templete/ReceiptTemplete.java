@@ -30,8 +30,14 @@ public class ReceiptTemplete extends AReceiptTemplete {
 			Integer takeawayId = turnover.getTakeawayId();
 			map.put("takeawayNo", takeawayId);
 			map.put("memo", takeaway.getMemo());
-			map.put("deliveryPayment", takeaway.getDeliveryPayment());
-			map.put("source", takeaway.getSource());
+
+			Integer source = takeaway.getSource();
+			map.put("source", source);
+			if (source == 1) {
+				map.put("deliveryPayment", takeaway.getDeliveryPayment());
+				map.put("deliveryTimestamp", takeaway.getDeliveryTimestamp());
+			}
+
 		} else {
 			int tableId = turnover.getTableId();
 			map.put("tableNo", tableId);

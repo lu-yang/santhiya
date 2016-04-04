@@ -26,8 +26,11 @@ body{font-family:"Times new roman";margin:0;padding:0;width:1480px; font-size:10
 	<#else>
 	<p class="font" style="margin-left:60px; text-decoration:underliner;">Emporter</p>
 	<p class="text-right">${memo}</p>
+	<#if source == 1 >
 	<p class="font" style="margin-left:60px; text-decoration:underliner;">Payment</p>
 	<p class="text-right">${deliveryPayment}</p>
+	<p class="text-right">${deliveryTimestamp}</p>
+	</#if>
 	</#if>
 	<br>
 	<hr>
