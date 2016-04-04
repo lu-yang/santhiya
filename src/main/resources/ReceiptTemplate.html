@@ -29,7 +29,7 @@ body{font-family:"Times new roman";margin:0;padding:0;width:1480px; font-size:10
 	<#if source == 1 >
 	<p class="font" style="margin-left:60px; text-decoration:underliner;">Payment</p>
 	<p class="text-right">${deliveryPayment}</p>
-	<p class="text-right">${deliveryTimestamp}</p>
+	<p class="text-right">${(deliveryTimestamp?string("dd-MMM hh:mm"))!} </p>
 	</#if>
 	</#if>
 	<br>
