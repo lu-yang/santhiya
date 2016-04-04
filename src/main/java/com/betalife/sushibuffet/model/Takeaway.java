@@ -1,5 +1,6 @@
 package com.betalife.sushibuffet.model;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class Takeaway extends BaseModel {
@@ -17,7 +18,7 @@ public class Takeaway extends BaseModel {
 	private Boolean delivery;
 	private Turnover turnover;
 	// @JsonFormat(pattern = "yyyy/MM/dd hh:mm:ss")
-	private Date deliveryTimestamp;
+	private Timestamp deliveryTimestamp;
 	private Integer deliveryPayment;
 
 	public Integer getDeliveryPayment() {
@@ -28,11 +29,11 @@ public class Takeaway extends BaseModel {
 		this.deliveryPayment = deliveryPayment;
 	}
 
-	public Date getDeliveryTimestamp() {
+	public Timestamp getDeliveryTimestamp() {
 		return deliveryTimestamp;
 	}
 
-	public void setDeliveryTimestamp(Date deliveryTimestamp) {
+	public void setDeliveryTimestamp(Timestamp deliveryTimestamp) {
 		this.deliveryTimestamp = deliveryTimestamp;
 	}
 
