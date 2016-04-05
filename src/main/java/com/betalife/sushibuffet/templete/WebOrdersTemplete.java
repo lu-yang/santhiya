@@ -27,6 +27,7 @@ public class WebOrdersTemplete extends AReceiptTemplete {
 		Integer takeawayId = turnover.getTakeawayId();
 		map.put("takeawayNo", takeawayId);
 		map.put("memo", takeaway.getMemo());
+		map.put("delivery", takeaway.isDelivery());
 		map.put("deliveryPayment", takeaway.getDeliveryPayment());
 		map.put("deliveryTimestamp", takeaway.getDeliveryTimestamp());
 

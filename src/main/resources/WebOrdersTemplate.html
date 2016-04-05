@@ -21,11 +21,24 @@ body{font-family:"Times new roman";margin:0;padding:0;width:1480px; font-size:10
 <p style="text-align:center;">山寿司</p>
 </div>
 <div class="rep">
-	<p class="font" style="margin-left:60px; text-decoration:underliner;">Emporter</p>
+	<p class="font" style="margin-left:60px; text-decoration:underliner;">Commande en Ligne ${(deliveryTimestamp?string("dd-MM-YY"))!} </p>
+	<p class="text-right">
+	<#if delivery == true>
+	Livraison à partir: 
+	<#else>
+	Emporter à partir: 
+	</#if>
+	${(deliveryTimestamp?string("HH:mm"))!} 
+	</p>
+	
 	<p class="text-right">${memo}</p>
-	<p class="font" style="margin-left:60px; text-decoration:underliner;">Payment</p>
-	<p class="text-right">${deliveryPayment}</p>
-	<p class="text-right">${(deliveryTimestamp?string("dd-MMM hh:mm"))!} </p>
+	<#if deliveryPayment != 0>
+	<p class="font" style="margin-left:60px; text-decoration:underliner;">Mode de paiement:
+	<#if deliveryPayment == 1> Espèces</#if>
+	<#if deliveryPayment == 2> Carte</#if>
+	</p>
+	</#if>
+
 	
 	<br>
 	<hr>
