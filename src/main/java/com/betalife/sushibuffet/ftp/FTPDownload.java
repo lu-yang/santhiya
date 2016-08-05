@@ -85,7 +85,7 @@ public class FTPDownload {
 	}
 
 	public void download() {
-
+		log.info("FTP下载开始。");
 		try {
 
 			ftp.connect(server, port);
