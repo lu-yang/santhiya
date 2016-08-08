@@ -30,7 +30,7 @@ public class WebOrderProcessor {
 	private void process(String local, String moveTo) {
 		File root = new File(local);
 		File[] listFiles = root.listFiles();
-		log.info("process from " + local + ", [size: " + listFiles == null ? 0 : listFiles.length + "]");
+		log.info("process from " + local + ", [size: " + (listFiles == null ? 0 : listFiles.length) + "]");
 		if (!ArrayUtils.isEmpty(listFiles)) {
 
 			for (int i = 0; i < listFiles.length; i++) {

@@ -78,6 +78,10 @@ public class FTPDownload {
 	public void init() {
 		ftp = new FTPClient();
 
+		ftp.setDefaultTimeout(10 * 1000);
+		ftp.setConnectTimeout(10 * 1000);
+		ftp.setDataTimeout(10 * 1000);
+
 		ftp.setCopyStreamListener(createListener());
 
 		// suppress login details
