@@ -28,7 +28,11 @@ body{font-family:"Times new roman";margin:0;padding:0;width:1480px; font-size:10
 	<#else>
 	Emporter à partir: 
 	</#if>
+	<#if deliveryTimestamp??>
 	${(deliveryTimestamp?string("HH:mm"))!} 
+	<#else>
+	Le plus vite
+	</#if>
 	</p>
 	
 	<p class="text-right">${memo}</p>
