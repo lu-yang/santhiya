@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.betalife.sushibuffet.dao.OrderProductGroupMapper">
@@ -9,10 +9,10 @@
 			order_id, product_id, updated, status, served
 		FROM
 			`orderproductgroup`
-		WHERE 
+		WHERE
 			order_id = #{id}
 	</select>
-	
+
 	<insert id="insert" parameterType="OrderProductGroup">
 		INSERT INTO `orderproductgroup`
 		(order_id, product_id, `status`, served, updated)
@@ -20,10 +20,10 @@
 		(#{order.id}, #{product.id}, #{status}, #{served}, #{updated})
 	</insert>
 
-	
+
 	<update id="update" parameterType="OrderProductGroup">
 		UPDATE `orderproductgroup`
-		SET 
+		SET
 		updated=NOW()
 		<if test="status == 0">
 		, served = NOW()
@@ -32,20 +32,20 @@
 		, served = null
 		</if>
 		, status = #{status}
-		WHERE order_id = #{id} 
+		WHERE order_id = #{id}
 		AND product_id = #{product.id}
 	</update>
-	
+
 	<update id="reminder" parameterType="Order">
 		UPDATE `orderproductgroup`
-		SET 
+		SET
 		updated=NOW()
 		, served = null
 		, status = #{status}
-		WHERE order_id = #{order.id} 
+		WHERE order_id = #{id} 
 		AND status != 0
 	</update>
-	
+
 	<delete id="deleteByOrderId" parameterType="Order">
 		DELETE FROM `orderproductgroup`
 		WHERE order_id=#{id}

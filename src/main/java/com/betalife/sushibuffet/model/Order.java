@@ -8,7 +8,7 @@ import org.apache.commons.collections.CollectionUtils;
 
 public class Order extends BaseModel {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	// private int turnoverId;
