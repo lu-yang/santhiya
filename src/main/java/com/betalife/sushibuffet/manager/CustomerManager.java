@@ -657,9 +657,17 @@ public class CustomerManager {
 
 	@Transactional(rollbackFor = Exception.class)
 	public void serveOrder(int id, int productId, int status) {
-		OrderProductGroup opg = new OrderProductGroup();
 		Order o = new Order();
 		o.setId(id);
+
+		Map<Integer, List<Integer>> productGroup = getProductGroup();
+		if (!productGroup.containsKey(productId)) {
+			o.setStatus(status);
+			orderMapper.update(o);
+			return;
+		}
+
+		OrderProductGroup opg = new OrderProductGroup();
 		opg.setOrder(o);
 		Product p = new Product();
 		p.setId(productId);
