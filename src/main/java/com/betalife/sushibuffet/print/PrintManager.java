@@ -56,7 +56,15 @@ public class PrintManager implements ApplicationContextAware {
 		List<Object> list = new ArrayList<Object>();
 		list.add(content);
 		list.add(printer.getCutPaper());
-		printer.print(list, logo, times);
+		try {
+			printer.print(list, logo, times);
+		} catch (Exception e) {
+			if (barName == "default") {
+				throw e;
+			} else {
+				print("default", content, logo, times);
+			}
+		}
 	}
 
 	private Printer getPrinter(String barName) {
@@ -65,7 +73,7 @@ public class PrintManager implements ApplicationContextAware {
 		if (printers.containsKey(key)) {
 			logicName = printers.getProperty(key);
 			if (StringUtils.isEmpty(logicName)) {
-				return null;
+				logicName = printers.getProperty("printer.default");
 			}
 		} else {
 			logicName = printers.getProperty("printer.default");
