@@ -56,15 +56,7 @@ public class PrintManager implements ApplicationContextAware {
 		List<Object> list = new ArrayList<Object>();
 		list.add(content);
 		list.add(printer.getCutPaper());
-		try {
-			printer.print(list, logo, times);
-		} catch (Exception e) {
-			if (barName == "default") {
-				throw e;
-			} else {
-				print("default", content, logo, times);
-			}
-		}
+		printer.print(list, logo, times);
 	}
 
 	private Printer getPrinter(String barName) {
@@ -138,7 +130,15 @@ public class PrintManager implements ApplicationContextAware {
 		for (String barName : keySet) {
 			Map<String, Object> map = barnameParamMap.get(barName);
 			Object object = contentTemplete.getPosTemplete().format(map);
-			print(barName, object, logo, times);
+			try {
+				print(barName, object, logo, times);
+			} catch (Exception e) {
+				if (barName == "default") {
+					throw e;
+				} else {
+					print("default", object, logo, times);
+				}
+			}
 		}
 
 	}
