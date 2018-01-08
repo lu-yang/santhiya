@@ -53,6 +53,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class CustomerManager {
 
+	private static final int ORDER_MODIFIED_CANCEL = 3;
+	private static final int ORDER_MODIFIED_INCREASE = 1;
+	private static final int ORDER_MODIFIED_DECREASE = 2;
+	private static final int ORDER_MODIFIED_UNCHANGED = 0;
+
+	private static final String FIELD_ID = "id";
+
 	private static final Logger logger = LoggerFactory.getLogger(CustomerManager.class);
 
 	@Autowired
@@ -242,98 +249,118 @@ public class CustomerManager {
 		return map;
 	}
 
+	/**
+	 * 保存或修改点餐
+	 * 
+	 * @param turnoverId
+	 *            int, 翻台id, 如果翻台记录不存在抛异常
+	 * @param orders
+	 *            List<Order>, 点餐列表, 如果为空抛异常
+	 * @param isPrint
+	 *            boolean, 是否打印
+	 * @return turnover
+	 * @throws Exception
+	 */
 	@Transactional(rollbackFor = Exception.class)
 	public Turnover takeOrders(int turnoverId, List<Order> orders, boolean isPrint) throws Exception {
 		if (CollectionUtils.isEmpty(orders)) {
-			throw new IllegalArgumentException("Check Failed: orders is empty.");
+			throw new IllegalArgumentException("点餐列表不能为空。");
 		}
 
+		// 获取所有套餐
 		Map<Integer, List<Integer>> productGroup = getProductGroup();
 
 		Turnover turnover = new Turnover();
 		turnover.setId(turnoverId);
 		turnover = turnoverMapper.select(turnover);
 		if (turnover == null) {
-			throw new IllegalArgumentException("Check Failed: turnover is empty.");
+			throw new IllegalArgumentException("翻台记录不存在。");
 		}
 
 		Date now = new Date();
-		for (Order o : orders) {
-			if (o.getId() == 0) {
-				o.setPrinted(isPrint);
-				o.setCreated(now);
-				o.setTurnover(turnover);
-				o.setModified(0);
-				orderMapper.insert(o);
+		for (Order order : orders) {
+			if (order.getId() == 0) {
+				// 创建点单
+				order.setPrinted(isPrint);
+				order.setCreated(now);
+				order.setTurnover(turnover);
+				orderMapper.insert(order);
 
-				int productId = o.getProduct().getId();
+				int productId = order.getProduct().getId();
 				if (productGroup.containsKey(productId)) {
-					List<Integer> list = productGroup.get(productId);
-					OrderProductGroup opg = new OrderProductGroup();
-					for (Integer id : list) {
-						opg.setOrder(o);
-						Product p = new Product();
-						p.setId(id);
-						opg.setProduct(p);
-						orderProductGroupMapper.insert(opg);
+					// 套餐
+					// 套餐中所有菜品
+					List<Integer> productIdList = productGroup.get(productId);
+					OrderProductGroup orderProductGroup = new OrderProductGroup();
+					// 保存套餐菜品
+					for (Integer id : productIdList) {
+						orderProductGroup.setOrder(order);
+						Product product = new Product();
+						product.setId(id);
+						orderProductGroup.setProduct(product);
+						orderProductGroupMapper.insert(orderProductGroup);
 					}
 				}
 
-				List<OrderAttribution> orderAttributions = o.getOrderAttributions();
+				// 保存所有配菜
+				List<OrderAttribution> orderAttributions = order.getOrderAttributions();
 				if (CollectionUtils.isNotEmpty(orderAttributions)) {
-					for (OrderAttribution oa : orderAttributions) {
-						oa.setOrderId(o.getId());
-						oa.setCreated(now);
-						orderAttributionMapper.insert(oa);
+					for (OrderAttribution orderAttribution : orderAttributions) {
+						orderAttribution.setOrderId(order.getId());
+						orderAttribution.setCreated(now);
+						orderAttributionMapper.insert(orderAttribution);
 					}
 				}
 			} else {
-				// Map<String, Integer> params = new HashMap<String, Integer>();
-				// params.put("orderId", o.getId());
-				// orderAttributionMapper.delete(params);
-
-				Order orderCopy = orderMapper.select(o);
-				int count = orderCopy.getCount() + o.getCount();
-				// Modified: 0:未修改数量；1：加菜；2：减菜；3：消菜
+				// 修改点单
+				Order orderCopy = orderMapper.select(order);
+				int count = orderCopy.getCount() + order.getCount();
 				if (count == 0) {
+					// 取消
 					orderMapper.delete(orderCopy);
 					orderProductGroupMapper.deleteByOrderId(orderCopy);
-					o.setOrderAttributions(null);
-					o.setModified(3);
+					order.setOrderAttributions(null);
+					order.setModified(ORDER_MODIFIED_CANCEL);
+					logger.info("取消点单: " + order.getId());
 				} else {
-					Order model = new Order();
-					model.setId(o.getId());
-					model.setCount(count);
-					// model.setPrinted(isPrint);
-					orderMapper.update(model);
-					o.setModified(o.getCount() > 0 ? 1 : 2);
+					// 修改
+					Order newOrder = new Order();
+					newOrder.setId(order.getId());
+					newOrder.setCount(count);
+					orderMapper.update(newOrder);
+					order.setModified(order.getCount() > 0 ? ORDER_MODIFIED_INCREASE : ORDER_MODIFIED_DECREASE);
+					logger.info("修改点单: " + order.getId());
 				}
 
-				List<OrderAttribution> orderAttributions = o.getOrderAttributions();
+				// 修改配菜
+				List<OrderAttribution> orderAttributions = order.getOrderAttributions();
 				if (CollectionUtils.isNotEmpty(orderAttributions)) {
 					Map<String, Integer> params = new HashMap<String, Integer>();
-					for (OrderAttribution oa : orderAttributions) {
-						OrderAttribution orderAttributionCopy = orderAttributionMapper.select(oa);
-						int orderAttributionCount = orderAttributionCopy.getCount() + oa.getCount();
+					for (OrderAttribution orderAttribution : orderAttributions) {
+						OrderAttribution orderAttributionCopy = orderAttributionMapper.select(orderAttribution);
+						int orderAttributionCount = orderAttributionCopy.getCount() + orderAttribution.getCount();
 						if (orderAttributionCount == 0) {
-							params.put("id", oa.getId());
+							// 取消
+							params.put(FIELD_ID, orderAttribution.getId());
 							orderAttributionMapper.delete(params);
-							oa.setModified(3);
+							orderAttribution.setModified(ORDER_MODIFIED_CANCEL);
+							logger.info("取消配菜 : " + orderAttribution.getId());
 						} else {
-							OrderAttribution model = new OrderAttribution();
-							model.setId(oa.getId());
-							model.setCount(orderAttributionCount);
-							orderAttributionMapper.update(model);
-							oa.setModified(oa.getCount() > 0 ? 1 : 2);
+							// 修改
+							OrderAttribution newOrderAttribution = new OrderAttribution();
+							newOrderAttribution.setId(orderAttribution.getId());
+							newOrderAttribution.setCount(orderAttributionCount);
+							orderAttributionMapper.update(newOrderAttribution);
+							orderAttribution.setModified(orderAttribution.getCount() > 0 ? ORDER_MODIFIED_INCREASE : ORDER_MODIFIED_DECREASE);
+							logger.info("修改配菜 : " + orderAttribution.getId());
 						}
 					}
 				}
-
 			}
-
 		}
 
 		if (isPrint) {
+			// 打印
 			printManager.printOrders(turnover, orders, locale, false);
 		}
 		return turnover;

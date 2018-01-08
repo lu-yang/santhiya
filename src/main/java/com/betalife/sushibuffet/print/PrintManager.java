@@ -20,6 +20,7 @@ import com.betalife.sushibuffet.model.Order;
 import com.betalife.sushibuffet.model.Takeaway;
 import com.betalife.sushibuffet.model.Turnover;
 import com.betalife.sushibuffet.templete.ContentTemplete;
+import com.betalife.sushibuffet.templete.InnerWebOrdersTemplete;
 import com.betalife.sushibuffet.templete.LedgerTemplete;
 import com.betalife.sushibuffet.templete.OrderTemplete;
 import com.betalife.sushibuffet.templete.ReceiptTemplete;
@@ -42,6 +43,8 @@ public class PrintManager implements ApplicationContextAware {
 	private ReceiptTemplete receiptTemplete;
 	@Autowired
 	private WebOrdersTemplete webOrdersTemplete;
+	@Autowired
+	private InnerWebOrdersTemplete innerWebOrdersTemplete;
 
 	@Autowired
 	private LedgerTemplete ledgerTemplete;
@@ -114,6 +117,8 @@ public class PrintManager implements ApplicationContextAware {
 
 		Map<String, Map<String, Object>> barnameParamMap = webOrdersTemplete.buildBarnameParam(turnover, orders, locale, takeaway);
 		print(barnameParamMap, false, times, webOrdersTemplete);
+		barnameParamMap = innerWebOrdersTemplete.buildBarnameParam(turnover, orders, locale, takeaway);
+		print(barnameParamMap, false, times, innerWebOrdersTemplete);
 	}
 
 	public void printLedger(List<Order> orders) throws Exception {
