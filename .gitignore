@@ -12,5 +12,3 @@ src/main/resources/printers.properties
 src/main/resources/log4j.properties
 
 src/main/resources/config.properties
-
-src/main/resources/config.properties
